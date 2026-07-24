@@ -916,6 +916,7 @@ document.addEventListener('DOMContentLoaded', () => {
         currentUserIsAdmin = false;
       }
       
+      updateDashboardData(); // Update user profile name and email
       renderChapters();
       showScreen('mylearning');
       startStudyTimer();
