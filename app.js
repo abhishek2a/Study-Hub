@@ -143,18 +143,23 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!isProfileVisible) {
         document.querySelectorAll('.sh-nav li').forEach(li => li.classList.remove('active'));
     } else {
-        document.getElementById('nav-chapters').classList.add('active');
+        const navCh = document.getElementById('nav-chapters');
+        if(navCh) navCh.classList.add('active');
     }
     
     if (isProfileVisible) {
       profileTab.classList.add('hidden');
       profileTab.style.display = 'none';
       if (qbTab) { qbTab.classList.add('hidden'); qbTab.style.display = 'none'; }
-      contentWrapper.classList.remove('hidden');
-      contentWrapper.style.display = 'block';
+      if (contentWrapper) {
+        contentWrapper.classList.remove('hidden');
+        contentWrapper.style.display = 'block';
+      }
     } else {
-      contentWrapper.classList.add('hidden');
-      contentWrapper.style.display = 'none';
+      if (contentWrapper) {
+        contentWrapper.classList.add('hidden');
+        contentWrapper.style.display = 'none';
+      }
       if (qbTab) { qbTab.classList.add('hidden'); qbTab.style.display = 'none'; }
       
       profileTab.classList.remove('hidden');
@@ -195,7 +200,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   window.showStudyChapters = function() {
     document.querySelectorAll('.sh-nav li').forEach(li => li.classList.remove('active'));
-    document.getElementById('nav-chapters').classList.add('active');
+    const navCh = document.getElementById('nav-chapters');
+    if(navCh) navCh.classList.add('active');
     
     const profileTab = document.getElementById('tab-profile');
     const contentWrapper = document.getElementById('sh-content-wrapper');
@@ -208,7 +214,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   window.showQuestionBanks = function() {
     document.querySelectorAll('.sh-nav li').forEach(li => li.classList.remove('active'));
-    document.getElementById('nav-qb').classList.add('active');
+    const navQb = document.getElementById('nav-qb');
+    if(navQb) navQb.classList.add('active');
     
     const profileTab = document.getElementById('tab-profile');
     const contentWrapper = document.getElementById('sh-content-wrapper');
@@ -582,15 +589,16 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   window.setSyncStatus = function(status) {
-    const el = document.getElementById('sync-status');
-    if (!el) return;
-    el.classList.remove('hidden');
+    const textEl = document.getElementById('sync-status');
+    const containerEl = document.getElementById('sync-status-container');
+    if (!textEl || !containerEl) return;
+    
     if (status === 'Syncing...') {
-      el.innerHTML = '<i data-lucide="upload-cloud" style="width: 14px; height: 14px;"></i> <span>Syncing...</span>';
+      containerEl.innerHTML = '<i data-lucide="upload-cloud" style="width: 20px; height: 20px; margin-bottom: 3px;"></i><span id="sync-status" style="font-size: 11px; color: var(--text-light);">Syncing...</span>';
     } else {
-      el.innerHTML = '<i data-lucide="cloud" style="width: 14px; height: 14px;"></i> <span>Saved</span>';
+      containerEl.innerHTML = '<i data-lucide="cloud-check" style="width: 20px; height: 20px; margin-bottom: 3px;"></i><span id="sync-status" style="font-size: 11px; color: var(--text-light);">Synced</span>';
     }
-    if (window.lucide) window.lucide.createIcons();
+    if (window.lucide) window.lucide.createIcons({ root: containerEl });
   };
 
   window.saveNotesModal = async function() {
