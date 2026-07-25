@@ -1119,8 +1119,46 @@ body {
 
 
 /* Responsive Layout Fixes for Mobile (Android & iOS) */
+/* Responsive Layout Fixes for Mobile (Android & iOS) */
 @media (max-width: 768px) {
+  /* Stack the layout instead of side-by-side */
+  .sh-body {
+    flex-direction: column !important;
+  }
+  
+  /* Make sidebar horizontal and full width */
+  .sh-sidebar {
+    width: 100% !important;
+    height: auto !important;
+    border-right: none !important;
+    border-bottom: 1px solid var(--border-color);
+    padding: 10px !important;
+  }
+  
+  /* Reflow navigation links in sidebar */
+  .sh-nav {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 10px !important;
+  }
+  .sh-nav li {
+    padding: 10px !important;
+    flex: 1 1 auto;
+    text-align: center;
+    border-radius: 6px;
+  }
+  
   /* Fix header flexboxes */
+  .sh-top-left {
+    flex-wrap: wrap !important;
+  }
+  
+  #course-title-display {
+    white-space: normal !important;
+    line-height: 1.2;
+    max-width: 100%;
+  }
+
   #my-learning-screen > div:first-child,
   #sh-header {
     flex-wrap: wrap !important;
