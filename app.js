@@ -1410,7 +1410,7 @@ document.addEventListener('DOMContentLoaded', async () => { try {
       chapter: document.getElementById('track-chapter').value,
       source: document.getElementById('track-source').value,
       section: document.getElementById('track-section').value,
-      qty: parseInt(document.getElementById('track-qty').value, 10),
+      qty: document.getElementById('track-qty').value.trim(),
       timeMins: parseInt(document.getElementById('track-time').value, 10),
       dateStr: document.getElementById('track-date').value,
       timestamp: firebase.firestore.FieldValue.serverTimestamp()
