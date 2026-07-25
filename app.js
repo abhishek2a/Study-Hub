@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => { try {
 
   const firebaseConfig = {
     apiKey: "AIzaSyCnL8zEma0QfE0GIUsTilPI096d9KhFCvQ",
@@ -27,6 +27,89 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const auth = firebase.auth();
   const db = firebase.firestore();
+  
+  // --- Session Tracking Logic ---
+  async function loadSessionHistory() {
+    const container = document.getElementById('study-history-container');
+    if (!container || !auth.currentUser) return;
+    
+    try {
+      const snap = await db.collection('users').doc(auth.currentUser.uid).collection('sessions').get({ source: 'server' });
+      
+      if (snap.empty) {
+        container.innerHTML = '<p style="color: var(--text-light); text-align: center; padding: 20px; margin: 0;">No study history available.</p>';
+        return;
+      }
+      
+      const allSessions = [];
+      snap.forEach(doc => allSessions.push(doc.data()));
+      
+      // Sort in memory (descending by loginTime)
+      allSessions.sort((a, b) => {
+        const timeA = a.loginTime ? a.loginTime.toMillis() : 0;
+        const timeB = b.loginTime ? b.loginTime.toMillis() : 0;
+        return timeB - timeA;
+      });
+      
+      // Group by date and sum total time
+      let sumAllMinutes = 0;
+      const grouped = {};
+      allSessions.forEach(data => {
+        sumAllMinutes += (data.durationMinutes || 0);
+        const dateStr = data.date || 'Unknown Date';
+        if (!grouped[dateStr]) grouped[dateStr] = { totalMinutes: 0, sessions: [] };
+        grouped[dateStr].totalMinutes += (data.durationMinutes || 0);
+        grouped[dateStr].sessions.push(data);
+      });
+      
+      // Keep global tracker in sync
+      if (typeof totalStudyMinutes !== 'undefined') {
+          totalStudyMinutes = sumAllMinutes;
+          if (typeof updateTimeUI === 'function') updateTimeUI();
+      }
+      
+      let html = '<div style="overflow-x: auto;"><table style="width: 100%; border-collapse: separate; border-spacing: 0; margin-top: 5px;">';
+      html += '<thead><tr style="background: var(--bg-color);"><th style="padding: 12px 15px; text-align: left; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid var(--border-color); color: var(--text-light); font-weight: 600; border-radius: 6px 0 0 0;">Date</th><th style="padding: 12px 15px; text-align: left; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid var(--border-color); color: var(--text-light); font-weight: 600;">Total Duration</th><th style="padding: 12px 15px; text-align: left; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid var(--border-color); color: var(--text-light); font-weight: 600;">Sessions Logged</th><th style="padding: 12px 15px; text-align: left; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid var(--border-color); color: var(--text-light); font-weight: 600; border-radius: 0 6px 0 0;">Status</th></tr></thead><tbody>';
+      
+      let rowCount = 0;
+      for (const [date, group] of Object.entries(grouped)) {
+        const formattedDate = new Date(date).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
+        
+        let durationStr = '0 mins';
+        const hrs = Math.floor(group.totalMinutes / 60);
+        const mins = group.totalMinutes % 60;
+        if (hrs > 0 && mins > 0) durationStr = `${hrs} hr ${mins} mins`;
+        else if (hrs > 0) durationStr = `${hrs} hr`;
+        else durationStr = `${mins} mins`;
+        
+        const hasActive = group.sessions.some(s => !s.logoutTime && s.sessionId === currentSessionId);
+        const statusHTML = hasActive 
+          ? '<span style="color: #F59E0B; background: rgba(245, 158, 11, 0.1); padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 600;">Active Session</span>'
+          : '<span style="color: #10B981; background: rgba(16, 185, 129, 0.1); padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 600;">Completed</span>';
+          
+        const rowStyle = "transition: background 0.2s ease; cursor: default;";
+        
+        html += `<tr style="${rowStyle}" onmouseover="this.style.background='var(--bg-color)'" onmouseout="this.style.background='transparent'">
+                   <td style="padding: 15px; font-size: 14px; font-weight: 500; color: var(--text-main); border-bottom: 1px solid var(--border-color);"><div style="display:flex;align-items:center;gap:8px;"><i data-lucide="calendar" style="width:16px;height:16px;color:var(--acca-red);"></i> ${formattedDate}</div></td>
+                   <td style="padding: 15px; font-size: 14px; font-weight: 600; color: var(--acca-red); border-bottom: 1px solid var(--border-color);">${durationStr}</td>
+                   <td style="padding: 15px; font-size: 14px; color: var(--text-light); border-bottom: 1px solid var(--border-color);">${group.sessions.length} Session${group.sessions.length > 1 ? 's' : ''}</td>
+                   <td style="padding: 15px; font-size: 14px; border-bottom: 1px solid var(--border-color);">${statusHTML}</td>
+                 </tr>`;
+        rowCount++;
+      }
+      
+      if (rowCount === 0) {
+          html += `<tr><td colspan="4" style="padding: 30px; text-align: center; color: var(--text-light);">No study history available yet.</td></tr>`;
+      }
+      
+      html += '</tbody></table></div>';
+      container.innerHTML = html;
+      if (typeof lucide !== 'undefined') lucide.createIcons();
+    } catch (error) {
+      console.error('Error loading session history:', error);
+      container.innerHTML = `<p style="color: var(--conf-red); text-align: center; padding: 20px; margin: 0;">Failed to load study history: ${error.message}</p>`;
+    }
+  }
 
   lucide.createIcons();
 
@@ -151,6 +234,8 @@ document.addEventListener('DOMContentLoaded', () => {
       profileTab.classList.add('hidden');
       profileTab.style.display = 'none';
       if (qbTab) { qbTab.classList.add('hidden'); qbTab.style.display = 'none'; }
+      const trackerTab = document.getElementById('tab-tracker');
+      if (trackerTab) { trackerTab.classList.add('hidden'); trackerTab.style.display = 'none'; }
       if (contentWrapper) {
         contentWrapper.classList.remove('hidden');
         contentWrapper.style.display = 'block';
@@ -161,13 +246,17 @@ document.addEventListener('DOMContentLoaded', () => {
         contentWrapper.style.display = 'none';
       }
       if (qbTab) { qbTab.classList.add('hidden'); qbTab.style.display = 'none'; }
+      const trackerTab = document.getElementById('tab-tracker');
+      if (trackerTab) { trackerTab.classList.add('hidden'); trackerTab.style.display = 'none'; }
       
       profileTab.classList.remove('hidden');
       profileTab.style.display = 'block';
       profileTab.style.opacity = '1';
       profileTab.style.visibility = 'visible';
-    }
-  };
+        
+        loadSessionHistory();
+      }
+    };
 
   window.toggleMyAccountFromML = function() {
       if (!window.currentCourse) {
@@ -186,7 +275,9 @@ document.addEventListener('DOMContentLoaded', () => {
          contentWrapper.classList.add('hidden');
          contentWrapper.style.display = 'none';
       }
-      if (qbTab) {
+      const trackerTab = document.getElementById('tab-tracker');
+       if (trackerTab) { trackerTab.classList.add('hidden'); trackerTab.style.display = 'none'; }
+       if (qbTab) {
          qbTab.classList.add('hidden');
          qbTab.style.display = 'none';
       }
@@ -195,6 +286,7 @@ document.addEventListener('DOMContentLoaded', () => {
          profileTab.style.display = 'block';
          profileTab.style.visibility = 'visible';
          profileTab.style.opacity = '1';
+         loadSessionHistory();
       }
   };
 
@@ -332,6 +424,25 @@ document.addEventListener('DOMContentLoaded', () => {
   let currentMockId = null;
   let isPracticeMode = false;
   
+    // Global click listeners for dropdowns
+    document.addEventListener('click', (e) => {
+      // Course dropdown
+      const courseContainer = document.getElementById('course-dropdown-container');
+      const courseMenu = document.getElementById('course-dropdown-menu');
+      if (courseContainer && courseMenu && !courseContainer.contains(e.target)) {
+        courseMenu.classList.add('hidden');
+      }
+      
+      // Filter dropdown
+      const filterBtn = document.querySelector('.sh-filter-btn');
+      const filterMenu = document.getElementById('filter-dropdown');
+      if (filterBtn && filterMenu && !filterBtn.contains(e.target) && !filterMenu.contains(e.target)) {
+        filterMenu.classList.add('hidden');
+      }
+    });
+    
+    let isTracking = false;
+  
   // Define questions as empty initially, will be populated on startMock
   let questions = [];
   let isHighlightMode = false;
@@ -433,18 +544,19 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Fetch Firestore Data
     try {
-      const userDoc = await db.collection("users").doc(user.uid).get();
-      if (userDoc.exists) {
-        userDataCache = userDoc.data();
-        if (!userDataCache.history) userDataCache.history = [];
-        if (!userDataCache.topics) userDataCache.topics = {};
-      } else {
-        userDataCache = { history: [], topics: {} };
+        const userDoc = await db.collection("users").doc(user.uid).get();
+        if (userDoc.exists) {
+          const data = userDoc.data();
+          if (profileEmailElem) profileEmailElem.textContent = data.email || user.email;
+          userDataCache = data;
+          if (!userDataCache.history) userDataCache.history = [];
+          if (!userDataCache.topics) userDataCache.topics = {};
+        }
+        loadSessionHistory();
+      } catch (err) {
+        console.error("Error fetching user data", err);
       }
       renderAnalytics();
-    } catch (err) {
-      console.error("Error fetching user data:", err);
-    }
   }
 
   // --- Course Structure ---
@@ -499,6 +611,13 @@ document.addEventListener('DOMContentLoaded', () => {
       const mainSel = document.getElementById('course-selector-main');
       if (topSel) topSel.value = courseValue;
       if (mainSel) mainSel.value = courseValue;
+      
+      const titleStr = courseValue === 'acca' ? 'For Exams from September 2026 to June 2027 – (FR) Financial Reporting' : 'Kerala Co-operative Service Examination Board (CSEB)';
+      const headingDisplay = document.getElementById('course-heading-display');
+      const titleDisplay = document.getElementById('course-title-display');
+      
+      if (headingDisplay) headingDisplay.textContent = titleStr;
+      if (titleDisplay) titleDisplay.textContent = titleStr;
     }
     renderChapters();
   };
@@ -728,16 +847,21 @@ document.addEventListener('DOMContentLoaded', () => {
     
     try {
       const snap = await db.collection("users").doc(auth.currentUser.uid).collection("progress").get();
-      
       let bookmarkCount = 0;
       let highConfCount = 0;
+      let accaMastered = 0;
+      let csebMastered = 0;
       
       snap.forEach(doc => {
         const chapterId = doc.id;
         const data = doc.data();
         
         if (data.bookmarked) bookmarkCount++;
-        if (data.confidence === 'green') highConfCount++;
+        if (data.confidence === 'green') {
+           highConfCount++;
+           if (chapterId.startsWith('cseb_')) csebMastered++;
+           else if (chapterId.startsWith('chapter_')) accaMastered++;
+        }
         
         const item = document.querySelector(`.sh-acc-item[data-chapter-id="${chapterId}"]`);
         if (item) {
@@ -761,6 +885,18 @@ document.addEventListener('DOMContentLoaded', () => {
       const cEl = document.getElementById('stat-confidence');
       if (bEl) bEl.textContent = bookmarkCount;
       if (cEl) cEl.textContent = highConfCount;
+      
+      // Update progress percentages
+      const accaTotal = typeof courseStructure !== 'undefined' && courseStructure.acca ? courseStructure.acca.length : 1;
+      const csebTotal = typeof courseStructure !== 'undefined' && courseStructure.cseb ? courseStructure.cseb.length : 1;
+      
+      const accaPercent = Math.floor((accaMastered / accaTotal) * 100);
+      const csebPercent = Math.floor((csebMastered / csebTotal) * 100);
+      
+      const pAcca = document.getElementById('progress-acca');
+      const pCseb = document.getElementById('progress-cseb');
+      if (pAcca) pAcca.textContent = accaPercent + '% Completed';
+      if (pCseb) pCseb.textContent = csebPercent + '% Completed';
       
       if (window.lucide) window.lucide.createIcons();
     } catch (e) {
@@ -874,6 +1010,7 @@ document.addEventListener('DOMContentLoaded', () => {
   
   // --- Global State ---
   let currentUserIsAdmin = false;
+  let currentSessionId = null;
   
   // --- Time Tracking ---
   let studyTimerInterval = null;
@@ -896,6 +1033,13 @@ document.addEventListener('DOMContentLoaded', () => {
         totalMinutes: totalStudyMinutes,
         lastActive: firebase.firestore.FieldValue.serverTimestamp()
       }, { merge: true });
+
+      // Update current session duration
+      if (currentSessionId) {
+        db.collection("users").doc(auth.currentUser.uid).collection("sessions").doc(currentSessionId).update({
+          durationMinutes: firebase.firestore.FieldValue.increment(1)
+        }).catch(() => {});
+      }
     }, 60000);
   }
   
@@ -922,6 +1066,19 @@ document.addEventListener('DOMContentLoaded', () => {
         currentUserIsAdmin = true;
       } else {
         currentUserIsAdmin = false;
+      }
+      
+      // Setup session tracking
+      if (!currentSessionId) {
+        currentSessionId = Date.now().toString();
+        const dateStr = new Date().toLocaleDateString('en-CA'); // YYYY-MM-DD
+        db.collection("users").doc(user.uid).collection("sessions").doc(currentSessionId).set({
+          sessionId: currentSessionId,
+          loginTime: firebase.firestore.FieldValue.serverTimestamp(),
+          logoutTime: null,
+          durationMinutes: 0,
+          date: dateStr
+        }, { merge: true }).catch(console.error);
       }
       
       updateDashboardData(); // Update user profile name and email
@@ -984,40 +1141,34 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // --- Auth Navigation ---
-  linkCreateAccount.addEventListener('click', (e) => {
-    e.preventDefault();
-    showScreen('register');
-  });
-
-  linkForgotPassword.addEventListener('click', (e) => {
-    e.preventDefault();
-    showScreen('forgot');
-  });
-
-  linkBackLogin1.addEventListener('click', (e) => {
-    e.preventDefault();
-    showScreen('login');
-  });
-
-  linkBackLogin2.addEventListener('click', (e) => {
-    e.preventDefault();
-    showScreen('login');
-  });
-
-  // --- Register Form Logic ---
-  function validateRegisterForm() {
-    if (regEmailInput.value.trim() && regPasswordInput.value.trim() && regConfirmInput.value.trim()) {
-      registerBtn.disabled = false;
-      registerBtn.classList.add('active');
-    } else {
-      registerBtn.disabled = true;
-      registerBtn.classList.remove('active');
-    }
+  if (linkCreateAccount) {
+    linkCreateAccount.addEventListener('click', (e) => {
+      e.preventDefault();
+      showScreen('register');
+    });
   }
-
-  regEmailInput.addEventListener('input', validateRegisterForm);
-  regPasswordInput.addEventListener('input', validateRegisterForm);
-  regConfirmInput.addEventListener('input', validateRegisterForm);
+  if (linkForgotPassword) {
+    linkForgotPassword.addEventListener('click', (e) => {
+      e.preventDefault();
+      showScreen('forgot');
+    });
+  }
+  if (linkBackLogin1) {
+    linkBackLogin1.addEventListener('click', (e) => {
+      e.preventDefault();
+      showScreen('login');
+    });
+  }
+  if (linkBackLogin2) {
+    linkBackLogin2.addEventListener('click', (e) => {
+      e.preventDefault();
+      showScreen('login');
+    });
+  }
+  function validateRegisterForm() { if (registerBtn && regEmailInput && regPasswordInput && regConfirmInput) { registerBtn.disabled = !(regEmailInput.value.trim() !== '' && regPasswordInput.value.trim() !== '' && regConfirmInput.value.trim() !== ''); } }
+  if (regEmailInput) regEmailInput.addEventListener('input', validateRegisterForm);
+  if (regPasswordInput) regPasswordInput.addEventListener('input', validateRegisterForm);
+  if (regConfirmInput) regConfirmInput.addEventListener('input', validateRegisterForm);
 
   registerForm.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -1106,6 +1257,12 @@ document.addEventListener('DOMContentLoaded', () => {
     navLogout.addEventListener('click', async (e) => {
       e.preventDefault();
       try {
+        if (currentSessionId && auth.currentUser) {
+          await db.collection("users").doc(auth.currentUser.uid).collection("sessions").doc(currentSessionId).update({
+            logoutTime: firebase.firestore.FieldValue.serverTimestamp()
+          }).catch(() => {});
+          currentSessionId = null;
+        }
         await auth.signOut();
         usernameInput.value = '';
         passwordInput.value = '';
@@ -1160,8 +1317,266 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  exitResultBtn.addEventListener('click', () => {
-    showScreen('study');
+  if (exitResultBtn) {
+    exitResultBtn.addEventListener('click', () => {
+      showScreen('study');
+    });
+  }
+
+  window.addEventListener('beforeunload', () => {
+    if (currentSessionId && auth.currentUser) {
+      db.collection('users').doc(auth.currentUser.uid).collection('sessions').doc(currentSessionId).update({
+        logoutTime: firebase.firestore.FieldValue.serverTimestamp()
+      }).catch(() => {});
+    }
   });
 
-});
+  // --- Study Tracker Logic ---
+  let trackerData = [];  let trackerSortCol = 'date';
+  let trackerSortAsc = false;
+
+  window.toggleTracker = function() {
+    try {
+      const trackerTab = document.getElementById('tab-tracker');
+      const profileTab = document.getElementById('tab-profile');
+      const qbTab = document.getElementById('tab-qb');
+      const contentWrapper = document.getElementById('sh-content-wrapper');
+      
+      if (!trackerTab) { alert('Tracker tab not found in DOM'); return; }
+      
+      const isVisible = trackerTab.style.display === 'block';
+      
+      if (!isVisible) {
+        document.querySelectorAll('.sh-nav li').forEach(li => li.classList.remove('active'));
+        const navTr = document.getElementById('nav-tracker');
+        if (navTr) navTr.classList.add('active');
+      } else {
+        const navCh = document.getElementById('nav-chapters');
+        if(navCh) navCh.classList.add('active');
+      }
+      
+      if (isVisible) {
+        trackerTab.classList.add('hidden');
+        trackerTab.style.display = 'none';
+        if (contentWrapper) {
+          contentWrapper.classList.remove('hidden');
+          contentWrapper.style.display = 'block';
+          contentWrapper.style.opacity = '1';
+          contentWrapper.style.visibility = 'visible';
+        }
+      } else {
+        if (contentWrapper) { contentWrapper.classList.add('hidden'); contentWrapper.style.display = 'none'; }
+        if (qbTab) { qbTab.classList.add('hidden'); qbTab.style.display = 'none'; }
+        if (profileTab) { profileTab.classList.add('hidden'); profileTab.style.display = 'none'; }
+        
+        trackerTab.classList.remove('hidden');
+        trackerTab.style.display = 'block';
+        trackerTab.style.opacity = '1';
+        trackerTab.style.visibility = 'visible';
+        
+        const subjectEl = document.getElementById('track-subject');
+        if (subjectEl) subjectEl.value = (typeof currentCourse === 'string' && currentCourse === 'acca') ? 'Financial Reporting' : (currentCourse || '');
+           
+        const chapterEl = document.getElementById('track-chapter');
+        if (chapterEl && typeof courseStructure !== 'undefined' && courseStructure[currentCourse]) {
+            chapterEl.innerHTML = '<option value="">Select Chapter</option>';
+            courseStructure[currentCourse].forEach(ch => {
+                chapterEl.innerHTML += '<option value="' + ch + '">' + ch + '</option>';
+            });
+        }
+        
+        const dateInput = document.getElementById('track-date');
+        if (dateInput && !dateInput.value) {
+           const d = new Date();
+           dateInput.value = d.toISOString().split('T')[0];
+        }
+        
+        window.loadTrackerData();
+      }
+    } catch(err) {
+      alert('Toggle Tracker Error: ' + err.message);
+    }
+  };
+  window.submitTracker = async function(e) {
+    e.preventDefault();
+    if (!auth.currentUser) return;
+    
+    const btn = document.getElementById('track-submit-btn');
+    btn.textContent = 'Saving...';
+    btn.disabled = true;
+    
+    const data = {
+      subject: document.getElementById('track-subject').value,
+      chapter: document.getElementById('track-chapter').value,
+      source: document.getElementById('track-source').value,
+      section: document.getElementById('track-section').value,
+      qty: parseInt(document.getElementById('track-qty').value, 10),
+      timeMins: parseInt(document.getElementById('track-time').value, 10),
+      dateStr: document.getElementById('track-date').value,
+      timestamp: firebase.firestore.FieldValue.serverTimestamp()
+    };
+    
+    try {
+      await db.collection('users').doc(auth.currentUser.uid).collection('studyTracker').add(data);
+      document.getElementById('tracker-form').reset();
+      document.getElementById('track-date').valueAsDate = new Date();
+      if (window.currentCourse) {
+         document.getElementById('track-subject').value = window.currentCourse.title || window.currentCourse.id || '';
+      }
+      await window.loadTrackerData();
+    } catch (err) {
+      console.error("Error saving tracker entry", err);
+      alert("Failed to save entry: " + err.message);
+    } finally {
+      btn.textContent = 'Log Session';
+      btn.disabled = false;
+    }
+  };
+
+  window.loadTrackerData = async function() {
+    const tbody = document.getElementById('tracker-table-body');
+    if (!auth.currentUser || !tbody) return;
+    
+    try {
+      const snap = await db.collection('users').doc(auth.currentUser.uid).collection('studyTracker').get({ source: 'server' });
+      trackerData = [];
+      snap.forEach(doc => {
+        trackerData.push({ id: doc.id, ...doc.data() });
+      });
+      
+      window.renderTrackerTable();
+    } catch (err) {
+      console.error("Error loading tracker data", err);
+      tbody.innerHTML = '<tr><td colspan="7" style="color: var(--conf-red); text-align: center; padding: 20px;">Failed to load data.</td></tr>';
+    }
+  };
+
+  window.sortTracker = function(col) {
+    if (trackerSortCol === col) {
+      trackerSortAsc = !trackerSortAsc;
+    } else {
+      trackerSortCol = col;
+      trackerSortAsc = true;
+    }
+    window.renderTrackerTable();
+  };
+  
+  window.searchTracker = function() {
+    window.renderTrackerTable();
+  };
+
+  window.renderTrackerTable = function() {
+    const tbody = document.getElementById('tracker-table-body');
+    if (!tbody) return;
+    
+    const query = (document.getElementById('track-search').value || '').toLowerCase();
+    
+    let filtered = trackerData.filter(item => {
+      if (!query) return true;
+      const subj = (item.subject || '').toLowerCase();
+      const chap = (item.chapter || '').toLowerCase();
+      return subj.includes(query) || chap.includes(query);
+    });
+    
+    filtered.sort((a, b) => {
+      let valA, valB;
+      if (trackerSortCol === 'date') {
+        valA = a.dateStr || ''; valB = b.dateStr || '';
+      } else if (trackerSortCol === 'subject') {
+        valA = (a.subject || '').toLowerCase(); valB = (b.subject || '').toLowerCase();
+      } else if (trackerSortCol === 'chapter') {
+        valA = (a.chapter || '').toLowerCase(); valB = (b.chapter || '').toLowerCase();
+      } else if (trackerSortCol === 'source') {
+        valA = (a.source || '').toLowerCase(); valB = (b.source || '').toLowerCase();
+      } else {
+        valA = a[trackerSortCol]; valB = b[trackerSortCol];
+      }
+      
+      if (valA < valB) return trackerSortAsc ? -1 : 1;
+      if (valA > valB) return trackerSortAsc ? 1 : -1;
+      return 0;
+    });
+    
+    if (filtered.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="7" style="padding: 20px; text-align: center; color: var(--text-light);">No practice sessions logged yet.</td></tr>';
+      return;
+    }
+    
+    let html = '';
+    filtered.forEach(item => {
+      html += `<tr style="border-bottom: 1px solid var(--border-color); background: var(--bg-main);">
+        <td style="padding: 12px; font-size: 13px; color: var(--text-main);">${item.dateStr || '-'}</td>
+        <td style="padding: 12px; font-size: 13px; color: var(--text-main); font-weight: 500;">${item.subject || '-'}</td>
+        <td style="padding: 12px; font-size: 13px; color: var(--text-main);">${item.chapter || '-'}</td>
+        <td style="padding: 12px; font-size: 13px;"><span style="background: rgba(0,0,0,0.05); padding: 2px 6px; border-radius: 4px;">${item.source || '-'}</span></td>
+        <td style="padding: 12px; font-size: 13px; color: var(--text-light);">${item.section || '-'}</td>
+        <td style="padding: 12px; font-size: 13px; font-weight: 600; text-align: right; color: var(--acca-red);">${item.qty || 0}</td>
+        <td style="padding: 12px; font-size: 13px; color: var(--text-light); text-align: right;">${item.timeMins || 0}m</td>
+      </tr>`;
+    });
+    tbody.innerHTML = html;
+  };
+
+} catch (err) { alert('Init Crash: ' + err.stack); } });
+window.openCourseDetails = function(courseId) {
+  const modal = document.getElementById('course-details-modal');
+  const title = document.getElementById('cd-modal-title');
+  const content = document.getElementById('cd-modal-content');
+  const startBtn = document.getElementById('cd-modal-start-btn');
+  
+  if (!modal) return;
+  
+  if(courseId === 'acca') {
+    title.textContent = 'ACCA Financial Reporting (FR)';
+    content.innerHTML = `
+      <h3 style="margin-top: 0; color: #E3000F;">Overview</h3>
+      <p style="color: var(--text-light);">The Financial Reporting (FR) syllabus develops knowledge and skills in understanding and applying accounting standards and the theoretical framework in the preparation of financial statements of entities, including groups and how to analyze and interpret those financial statements.</p>
+      
+      <h3 style="color: #E3000F;">Exam Format</h3>
+      <ul style="padding-left: 20px; color: var(--text-light);">
+        <li><strong>Section A:</strong> 15 objective test questions (30 marks)</li>
+        <li><strong>Section B:</strong> 3 objective test cases with 5 questions each (30 marks)</li>
+        <li><strong>Section C:</strong> 2 constructed response questions (40 marks)</li>
+      </ul>
+      
+      <div style="background: rgba(227, 0, 15, 0.05); padding: 15px; border-left: 4px solid #E3000F; border-radius: 4px; margin-top: 20px;">
+        <div style="display: flex; gap: 20px; color: var(--text-main);">
+           <div><strong>Duration:</strong> 3 Hours</div>
+           <div><strong>Pass Mark:</strong> 50%</div>
+        </div>
+      </div>
+    `;
+    startBtn.onclick = function() {
+       modal.classList.add('hidden');
+       startStudy('acca');
+    };
+  } else if (courseId === 'cseb') {
+    title.textContent = 'Kerala Cooperative Service Examination Board (CSEB)';
+    content.innerHTML = `
+      <h3 style="margin-top: 0; color: #E3000F;">Overview</h3>
+      <p style="color: var(--text-light);">The KSCEB conducts written examinations for the recruitment of various positions within co-operative societies in Kerala, including roles such as Junior Clerk/Cashier, Secretary, Assistant Secretary, and System Administrator.</p>
+      
+      <h3 style="color: #E3000F;">Syllabus Core Areas</h3>
+      <ul style="padding-left: 20px; color: var(--text-light);">
+        <li><strong>Co-operation:</strong> Principles and practices of cooperation, Co-operative Act and Rules.</li>
+        <li><strong>Banking & Accounting:</strong> Fundamentals of banking, accounting principles, auditing.</li>
+        <li><strong>General Knowledge & English:</strong> Grammar, vocabulary, and Kerala current affairs.</li>
+        <li><strong>Mathematics & Reasoning:</strong> Numerical ability and logical reasoning skills.</li>
+      </ul>
+      
+      <div style="background: rgba(227, 0, 15, 0.05); padding: 15px; border-left: 4px solid #E3000F; border-radius: 4px; margin-top: 20px;">
+        <div style="display: flex; flex-direction: column; gap: 5px; color: var(--text-main);">
+           <div><strong>Selection Process:</strong> Written exam (objective type) + Interview</div>
+           <div><strong>Target Posts:</strong> Clerks, Cashiers, Administrators</div>
+        </div>
+      </div>
+    `;
+    startBtn.onclick = function() {
+       modal.classList.add('hidden');
+       startStudy('cseb');
+    };
+  }
+  
+  modal.classList.remove('hidden');
+  if (window.lucide) window.lucide.createIcons();
+};

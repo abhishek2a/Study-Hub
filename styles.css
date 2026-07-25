@@ -11,6 +11,7 @@
   --bg-main: #F3F4F6; /* Softer background for contrast with white cards */
   --bg-alt: #FFFFFF;
   --panel-bg: #FFFFFF;
+  --sidebar-bg: rgba(255, 255, 255, 0.7);
   --hover-bg: #F9FAFB;
   --cbe-header: #000000;
   --shadow-card: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
@@ -23,6 +24,8 @@
   --conf-amber: #F59E0B;
   --conf-red: #EF4444;
 }
+
+
 
 
 
@@ -319,6 +322,10 @@ body {
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
   box-shadow: 0 4px 6px rgba(225, 37, 27, 0.2);
 }
 .sh-btn:hover {
@@ -340,8 +347,8 @@ body {
 }
 
 .cbe-topbar {
-  background: #000000;
-  color: #ffffff;
+  background: var(--cbe-header);
+  color: var(--text-main);
   padding: 0 20px;
   display: flex;
   justify-content: space-between;
@@ -442,7 +449,7 @@ body {
 }
 
 .cbe-bottombar {
-  background: #000000;
+  background: var(--cbe-header);
   padding: 15px 30px;
   display: flex;
   justify-content: space-between;
@@ -513,7 +520,7 @@ body {
 /* Highlighter & Strikethrough utility */
 .highlighted-text {
   background-color: yellow;
-  color: black;
+  color: var(--text-main);
 }
 
 .strikethrough-text {
@@ -638,7 +645,7 @@ body {
 
 /* Jspreadsheet tweaks to fit theme */
 .jexcel_container {
-  background: #fff;
+  background: var(--panel-bg);
   color: #333;
 }
 
@@ -732,7 +739,7 @@ body {
 
 .sh-sidebar {
   width: 260px;
-  background: rgba(255, 255, 255, 0.7);
+  background: var(--sidebar-bg);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border-right: 1px solid var(--border-color);
@@ -815,6 +822,7 @@ body {
   -moz-osx-font-smoothing: grayscale !important;
   text-rendering: optimizeLegibility !important;
 }
+
 .rich-text-display * {
   line-height: 1.6 !important;
 }
@@ -1106,4 +1114,56 @@ body {
 
 .sh-del-btn:hover {
   color: #c00;
+}
+
+
+
+/* Responsive Layout Fixes for Mobile (Android & iOS) */
+@media (max-width: 768px) {
+  /* Fix header flexboxes */
+  #my-learning-screen > div:first-child,
+  #sh-header {
+    flex-wrap: wrap !important;
+    gap: 15px !important;
+    padding: 15px !important;
+  }
+  
+  /* Fix side-by-side structures */
+  .ml-tabs {
+    flex-wrap: wrap !important;
+    gap: 15px !important;
+  }
+  
+  /* Study screen header */
+  #study-screen > div:first-child,
+  #study-header {
+    flex-wrap: wrap !important;
+    gap: 15px !important;
+    padding: 15px !important;
+  }
+
+  /* Modals */
+  #course-details-modal > div,
+  #notes-modal > div {
+    width: 95% !important;
+    max-height: 95vh !important;
+  }
+  
+  /* Notification modal */
+  #notif-modal {
+    width: 90% !important;
+    right: 5% !important;
+  }
+
+  /* Calculator */
+  #calculator-widget {
+    right: 5% !important;
+    max-width: 90vw !important;
+  }
+  
+  /* Login form */
+  .login-box {
+    width: 90% !important;
+    padding: 20px !important;
+  }
 }
