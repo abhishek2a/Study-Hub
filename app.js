@@ -1215,16 +1215,19 @@ document.addEventListener('DOMContentLoaded', async () => { try {
   usernameInput.addEventListener('input', validateForm);
   passwordInput.addEventListener('input', validateForm);
 
-  togglePassword.addEventListener('click', () => {
-    const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-    passwordInput.setAttribute('type', type);
-    
-    if (type === 'text') {
-      togglePassword.setAttribute('data-lucide', 'eye-off');
-    } else {
-      togglePassword.setAttribute('data-lucide', 'eye');
+  document.addEventListener('click', (e) => {
+    const toggleIcon = e.target.closest('#toggle-password');
+    if (toggleIcon) {
+      const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+      passwordInput.setAttribute('type', type);
+      
+      if (type === 'text') {
+        toggleIcon.setAttribute('data-lucide', 'eye-off');
+      } else {
+        toggleIcon.setAttribute('data-lucide', 'eye');
+      }
+      lucide.createIcons();
     }
-    lucide.createIcons();
   });
 
   loginForm.addEventListener('submit', async (e) => {
@@ -1728,6 +1731,8 @@ window.openCourseDetails = function(courseId) {
   modal.classList.remove('hidden');
   if (window.lucide) window.lucide.createIcons();
 };
+
+
 
 
 

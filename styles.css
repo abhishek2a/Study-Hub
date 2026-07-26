@@ -1344,3 +1344,12 @@ img {
 @media (max-width: 768px) {
   .sh-settings-row { flex-direction: column !important; align-items: stretch !important; gap: 15px; text-align: center; }
 }
+
+
+/* Fix Update Toast Z-Index and Layout */
+#update-toast {
+    z-index: 999999 !important;
+    align-items: center !important;
+    gap: 15px !important;
+}
+
