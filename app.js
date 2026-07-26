@@ -743,7 +743,7 @@ document.addEventListener('DOMContentLoaded', async () => { try {
       }, 1000);
     } catch(e) {
       console.error(e);
-      alert("Failed to save.");
+      alert("Failed to save: " + e.message + "\nIf it says missing permissions, please update your Firestore Rules in the Firebase Console using the firestore.rules file.");
       btn.textContent = "Save Changes";
       setSyncStatus("Saved");
     }
