@@ -1,4 +1,4 @@
-# Study Hub (ACCA Mock Portal)
+# Study Hub 
 
 A modern, highly optimized Progressive Web Application (PWA) built to help ACCA and CSEB students access mock exams, question banks, and meticulously track their daily study progress. 
 
