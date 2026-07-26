@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<script src="app.js?v=30"></script>
+<script src="app.js?v=36"></script>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
   <title>Study Hub Portal</title>
   <!-- Favicon -->
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
-  <link rel="stylesheet" href="styles.css?v=3">
+  <link rel="stylesheet" href="styles.css?v=18">
   <script src="https://unpkg.com/lucide@latest"></script>
   
   <!-- Quill Word Processor -->
@@ -25,8 +25,21 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 
+  <link rel="manifest" href="manifest.json">
+  <script>if(sessionStorage.getItem("splashShown")) { document.documentElement.style.setProperty("--splash-display", "none"); }</script>
 </head>
 <body>
+  <!-- SPLASH SCREEN -->
+  <div id="splash-screen" style="display: var(--splash-display, flex);">
+    <div class="sh-splash-logo">Study Hub</div>
+    <div class="sh-splash-loading">Loading...</div>
+  </div>
+  
+  <!-- UPDATE NOTIFICATION -->
+  <div id="update-toast" class="hidden">
+    <span>A new update is available!</span>
+    <button onclick="window.location.reload(true)">Reload</button>
+  </div>
 
   <!-- LOGIN SCREEN -->
   <div id="login-screen">
@@ -379,10 +392,11 @@
                     <th style="padding: 12px; font-size: 13px; color: var(--text-light); font-weight: 600;">Section</th>
                     <th style="padding: 12px; font-size: 13px; color: var(--text-light); font-weight: 600; text-align: right;">Qty</th>
                     <th style="padding: 12px; font-size: 13px; color: var(--text-light); font-weight: 600; text-align: right;">Mins</th>
+                    <th style="padding: 12px; font-size: 13px; color: var(--text-light); font-weight: 600; text-align: center;">Action</th>
                   </tr>
                 </thead>
                 <tbody id="tracker-table-body">
-                  <tr><td colspan="7" style="padding: 20px; text-align: center; color: var(--text-light);">Loading tracker data...</td></tr>
+                  <tr><td colspan="8" style="padding: 20px; text-align: center; color: var(--text-light);">Loading tracker data...</td></tr>
                 </tbody>
               </table>
             </div>
@@ -452,7 +466,7 @@
               <button id="nav-logout" class="sh-btn" style="background: #FEE2E2; color: #DC2626; border: none;">Sign Out</button>
             </div>
           </div>
-          
+          <p style="text-align: center; color: var(--text-light); margin-top: 40px; font-size: 12px; margin-bottom: 20px;">Version 1.0 (Build 1)</p>
         </div>
       </div> <!-- End Main -->
     </div> <!-- End Body -->
@@ -563,6 +577,8 @@
   </div>
 </body>
 </html>
+
+
 
 
 

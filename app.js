@@ -1,3 +1,28 @@
+// Hide splash screen if already shown this session
+if (sessionStorage.getItem('splashShown')) {
+  const splash = document.getElementById('splash-screen');
+  if (splash) {
+    splash.style.display = 'none';
+  }
+}
+
+// Register Service Worker for PWA
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('service-worker.js').then(reg => {
+      reg.onupdatefound = () => {
+        const installingWorker = reg.installing;
+        installingWorker.onstatechange = () => {
+          if (installingWorker.state === 'installed' && navigator.serviceWorker.controller) {
+            const toast = document.getElementById('update-toast');
+            if (toast) toast.classList.remove('hidden');
+          }
+        };
+      };
+    }).catch(err => console.log('Service worker registration failed: ', err));
+  });
+}
+
 document.addEventListener('DOMContentLoaded', async () => { try {
 
   const firebaseConfig = {
@@ -298,9 +323,11 @@ document.addEventListener('DOMContentLoaded', async () => { try {
     const profileTab = document.getElementById('tab-profile');
     const contentWrapper = document.getElementById('sh-content-wrapper');
     const qbTab = document.getElementById('tab-qb');
+    const trackerTab = document.getElementById('tab-tracker');
     
     if (profileTab) { profileTab.classList.add('hidden'); profileTab.style.display = 'none'; }
     if (qbTab) { qbTab.classList.add('hidden'); qbTab.style.display = 'none'; }
+    if (trackerTab) { trackerTab.classList.add('hidden'); trackerTab.style.display = 'none'; }
     if (contentWrapper) { contentWrapper.classList.remove('hidden'); contentWrapper.style.display = 'block'; }
   };
 
@@ -312,9 +339,11 @@ document.addEventListener('DOMContentLoaded', async () => { try {
     const profileTab = document.getElementById('tab-profile');
     const contentWrapper = document.getElementById('sh-content-wrapper');
     const qbTab = document.getElementById('tab-qb');
+    const trackerTab = document.getElementById('tab-tracker');
     
     if (profileTab) { profileTab.classList.add('hidden'); profileTab.style.display = 'none'; }
     if (contentWrapper) { contentWrapper.classList.add('hidden'); contentWrapper.style.display = 'none'; }
+    if (trackerTab) { trackerTab.classList.add('hidden'); trackerTab.style.display = 'none'; }
     if (qbTab) { qbTab.classList.remove('hidden'); qbTab.style.display = 'block'; }
     
     renderQuestionBanks();
@@ -618,6 +647,16 @@ document.addEventListener('DOMContentLoaded', async () => { try {
       
       if (headingDisplay) headingDisplay.textContent = titleStr;
       if (titleDisplay) titleDisplay.textContent = titleStr;
+      
+      // Hide Study Tracker for CSEB
+      const navTracker = document.getElementById('nav-tracker');
+      if (navTracker) {
+        if (courseValue === 'cseb') {
+          navTracker.style.display = 'none';
+        } else {
+          navTracker.style.display = 'flex';
+        }
+      }
     }
     renderChapters();
   };
@@ -1090,6 +1129,17 @@ document.addEventListener('DOMContentLoaded', async () => { try {
       showScreen('login');
       stopStudyTimer();
     }
+    
+    // Hide Splash Screen
+    setTimeout(() => {
+      const splash = document.getElementById('splash-screen');
+      if (splash) {
+        splash.style.opacity = '0';
+        splash.style.visibility = 'hidden';
+        setTimeout(() => splash.style.display = 'none', 500); // Fully hide after fade
+        sessionStorage.setItem('splashShown', 'true');
+      }
+    }, 1000);
   });
 
 
@@ -1447,7 +1497,7 @@ document.addEventListener('DOMContentLoaded', async () => { try {
       window.renderTrackerTable();
     } catch (err) {
       console.error("Error loading tracker data", err);
-      tbody.innerHTML = '<tr><td colspan="7" style="color: var(--conf-red); text-align: center; padding: 20px;">Failed to load data.</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="8" style="color: var(--conf-red); text-align: center; padding: 20px;">Failed to load data.</td></tr>';
     }
   };
 
@@ -1471,8 +1521,18 @@ document.addEventListener('DOMContentLoaded', async () => { try {
     
     const query = (document.getElementById('track-search').value || '').toLowerCase();
     
+    const d = new Date();
+    const pad = (n) => (n < 10 ? '0' + n : n);
+    const todayStr = d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+    
     let filtered = trackerData.filter(item => {
-      if (!query) return true;
+      // Only trigger global search if the query is specific enough (>3 chars or contains a number)
+      const isSpecificSearch = query && (query.length > 3 || /\d/.test(query));
+      
+      if (!isSpecificSearch) {
+        return item.dateStr === todayStr;
+      }
+      
       const subj = (item.subject || '').toLowerCase();
       const chap = (item.chapter || '').toLowerCase();
       return subj.includes(query) || chap.includes(query);
@@ -1498,7 +1558,10 @@ document.addEventListener('DOMContentLoaded', async () => { try {
     });
     
     if (filtered.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="7" style="padding: 20px; text-align: center; color: var(--text-light);">No practice sessions logged yet.</td></tr>';
+      const emptyMsg = isSpecificSearch 
+        ? "No practice sessions found for this search." 
+        : (query ? "Keep typing to search full history..." : "No practice sessions logged today.");
+      tbody.innerHTML = `<tr><td colspan="8" style="padding: 20px; text-align: center; color: var(--text-light);">${emptyMsg}</td></tr>`;
       return;
     }
     
@@ -1512,9 +1575,26 @@ document.addEventListener('DOMContentLoaded', async () => { try {
         <td style="padding: 12px; font-size: 13px; color: var(--text-light);">${item.section || '-'}</td>
         <td style="padding: 12px; font-size: 13px; font-weight: 600; text-align: right; color: var(--acca-red);">${item.qty || 0}</td>
         <td style="padding: 12px; font-size: 13px; color: var(--text-light); text-align: right;">${item.timeMins || 0}m</td>
+        <td style="padding: 12px; font-size: 13px; text-align: center;">
+          <button onclick="window.deleteTrackerEntry('${item.id}')" style="background: none; border: none; color: #DC2626; cursor: pointer; padding: 4px; border-radius: 4px;" title="Delete Entry" onmouseover="this.style.background='#FEE2E2'" onmouseout="this.style.background='none'">
+            <i data-lucide="trash-2" style="width: 16px; height: 16px;"></i>
+          </button>
+        </td>
       </tr>`;
     });
     tbody.innerHTML = html;
+    if (window.lucide) window.lucide.createIcons();
+  };
+
+  window.deleteTrackerEntry = async function(id) {
+    if (!confirm("Are you sure you want to delete this study session? This cannot be undone.")) return;
+    try {
+      await db.collection('users').doc(auth.currentUser.uid).collection('studyTracker').doc(id).delete();
+      await window.loadTrackerData();
+    } catch(err) {
+      console.error(err);
+      alert('Failed to delete: ' + err.message);
+    }
   };
 
 } catch (err) { alert('Init Crash: ' + err.stack); } });
