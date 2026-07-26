@@ -1316,3 +1316,31 @@ img {
     /* Hover effects only apply on devices that support hover (not touchscreens) */
   }
 }
+/* Mobile UI Fixes */
+.sh-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.sh-stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 40px; }
+.sh-profile-banner { background: var(--acca-red-gradient); padding: 40px 30px; border-radius: 12px; color: white; display: flex; align-items: center; gap: 20px; box-shadow: var(--shadow-card-hover); margin-bottom: 30px; }
+
+@media (max-width: 768px) {
+  .sh-grid-2 { grid-template-columns: 1fr !important; }
+  .sh-stats-grid { grid-template-columns: 1fr !important; }
+  .sh-profile-banner { flex-direction: column; padding: 20px; text-align: center; }
+  .sh-profile-banner > div:last-child { justify-content: center !important; width: 100%; margin-top: 10px; }
+  
+  /* Fix nav menu wrapping */
+  .sh-nav { flex-wrap: wrap !important; padding: 0 !important; }
+  .sh-nav li { flex: 1 1 40% !important; text-align: center; padding: 12px 5px !important; justify-content: center; font-size: 13px !important; }
+  
+  /* Fix study history table */
+  .sh-table-wrapper { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .sh-table { min-width: 500px; } 
+  
+  /* Fix Sign Out layout */
+  .sh-settings-card { flex-direction: column !important; text-align: center; gap: 15px !important; }
+}
+
+.sh-settings-row { display: flex; justify-content: space-between; align-items: center; }
+
+@media (max-width: 768px) {
+  .sh-settings-row { flex-direction: column !important; align-items: stretch !important; gap: 15px; text-align: center; }
+}

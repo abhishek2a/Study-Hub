@@ -1,9 +1,9 @@
-const CACHE_NAME = 'study-hub-v1';
+const CACHE_NAME = 'study-hub-v5';
 const urlsToCache = [
   './',
   './index.html',
-  './styles.css?v=12',
-  './app.js?v=31',
+  './styles.css?v=13',
+  './app.js?v=42',
   './icon.jpg'
 ];
 
@@ -34,12 +34,22 @@ self.addEventListener('activate', event => {
 
 self.addEventListener('fetch', event => {
   event.respondWith(
-    caches.match(event.request)
-      .then(response => {
-        if (response) {
-          return response;
-        }
-        return fetch(event.request);
+    fetch(event.request)
+      .then(networkResponse => {
+        // Cache the latest version
+        return caches.open(CACHE_NAME).then(cache => {
+          cache.put(event.request, networkResponse.clone());
+          return networkResponse;
+        });
+      })
+      .catch(() => {
+        // Fallback to cache if network fails
+        return caches.match(event.request);
       })
   );
 });
+
+
+
+
+

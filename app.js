@@ -391,10 +391,13 @@ document.addEventListener('DOMContentLoaded', async () => { try {
 
   // Register Logic
   const registerForm = document.getElementById('register-form');
+  const regNameInput = document.getElementById('reg-name');
   const regEmailInput = document.getElementById('reg-email');
   const regPasswordInput = document.getElementById('reg-password');
   const regConfirmInput = document.getElementById('reg-confirm');
   const registerBtn = document.getElementById('register-btn');
+  const regCourseAcca = document.getElementById('reg-course-acca');
+  const regCourseCseb = document.getElementById('reg-course-cseb');
 
   // Forgot Password Logic
   const forgotForm = document.getElementById('forgot-form');
@@ -554,6 +557,43 @@ document.addEventListener('DOMContentLoaded', async () => { try {
   async function updateDashboardData() {
     const user = auth.currentUser;
     if (!user) return;
+    
+    // UI Course Enrollment Check
+    if (window.userProfile && window.userProfile.enrolledCourses) {
+       const isCSEBEnrolled = window.userProfile.enrolledCourses.includes('cseb');
+       const csebCard = document.getElementById('cseb-card');
+       const availableContainer = document.getElementById('available-courses-container');
+       const inprogressContainer = document.getElementById('ml-inprogress-content').querySelector('div');
+       const availableSection = document.getElementById('ml-available-content');
+       
+       if (csebCard) {
+         if (isCSEBEnrolled) {
+            inprogressContainer.appendChild(csebCard);
+            availableSection.style.display = 'none';
+            document.getElementById('cseb-status-badge').textContent = 'Enrolled';
+            document.getElementById('cseb-status-badge').style.background = 'var(--panel-bg)';
+            document.getElementById('cseb-status-badge').style.color = 'var(--text-main)';
+            const dropdownBtn = document.getElementById('cseb-dropdown-btn');
+           if (dropdownBtn) dropdownBtn.style.display = 'flex';
+           document.getElementById('cseb-actions').innerHTML = `
+              <button onclick="openCourseDetails('cseb')"  style="width: 100%; padding: 10px; background: transparent; border: 1px solid #E3000F; color: #E3000F; font-size: 14px; cursor: pointer; border-radius: 6px; transition: all 0.2s;" onmouseover="this.style.background='#E3000F'; this.style.color='#fff'" onmouseout="this.style.background='transparent'; this.style.color='#E3000F'">View Course Details</button>
+              <button onclick="startStudy('cseb')" style="width: 100%; padding: 10px; background: #E3000F; border: none; color: white; font-size: 14px; font-weight: 600; cursor: pointer; border-radius: 6px; transition: background 0.2s;" onmouseover="this.style.background='#B8000C'" onmouseout="this.style.background='#E3000F'">Study</button>
+            `;
+         } else {
+            availableContainer.appendChild(csebCard);
+            availableSection.style.display = 'block';
+            document.getElementById('cseb-status-badge').textContent = 'Available';
+            document.getElementById('cseb-status-badge').style.background = '#10B981';
+            document.getElementById('cseb-status-badge').style.color = '#fff';
+            const dropdownBtn = document.getElementById('cseb-dropdown-btn');
+           if (dropdownBtn) dropdownBtn.style.display = 'none';
+           if (window.currentCourse === 'cseb') window.switchCourse('acca');
+           document.getElementById('cseb-actions').innerHTML = `
+              <button onclick="window.enrollCourse('cseb')"  style="width: 100%; padding: 10px; background: #10B981; border: none; color: white; font-size: 14px; font-weight: 600; cursor: pointer; border-radius: 6px; transition: background 0.2s;" onmouseover="this.style.background='#059669'" onmouseout="this.style.background='#10B981'">Enroll Now (Free)</button>
+            `;
+         }
+       }
+    }
     
     const displayNameElem = document.getElementById('user-display-name');
     const profileNameElem = document.getElementById('profile-name-display');
@@ -797,6 +837,15 @@ document.addEventListener('DOMContentLoaded', async () => { try {
     }
   };
 
+  window.clearNotifications = function() {
+    const list = document.getElementById('notif-list');
+    const badgeD = document.getElementById('notif-badge-desktop');
+    const badgeM = document.getElementById('notif-badge-mobile');
+    if(list) list.innerHTML = '<li style="padding: 10px 0; color: var(--text-light); text-align: center;">You have no new notifications.</li>';
+    if(badgeD) badgeD.style.display = 'none';
+    if(badgeM) badgeM.style.display = 'none';
+  };
+  
   window.toggleNotifications = function() {
     const m = document.getElementById('notif-modal');
     m.classList.toggle('hidden');
@@ -809,8 +858,10 @@ document.addEventListener('DOMContentLoaded', async () => { try {
     
     if (!query) return;
 
+    let found = false;
     courseStructure[currentCourse].forEach((ch, idx) => {
       if (ch.toLowerCase().includes(query)) {
+        found = true;
         const li = document.createElement('li');
         li.style.padding = '8px';
         li.style.borderBottom = '1px solid var(--border-color)';
@@ -818,21 +869,28 @@ document.addEventListener('DOMContentLoaded', async () => { try {
         li.textContent = ch;
         li.onclick = () => {
           window.toggleSearch();
-          const accs = document.querySelectorAll('.sh-acc-item');
-          if (accs[idx]) {
-            const header = accs[idx].querySelector('.sh-acc-header');
-            if (header) {
-                const bodyElement = header.nextElementSibling;
-                if (bodyElement && bodyElement.style.display !== 'block') {
-                    toggleAccordion(header);
-                }
+          window.showStudyChapters();
+          setTimeout(() => {
+            const accs = document.querySelectorAll('.sh-acc-item');
+            if (accs[idx]) {
+              const header = accs[idx].querySelector('.sh-acc-header');
+              if (header) {
+                  const bodyElement = header.nextElementSibling;
+                  if (bodyElement && bodyElement.style.display !== 'block') {
+                      window.toggleAccordion(header);
+                  }
+              }
+              accs[idx].scrollIntoView({behavior: 'smooth', block: 'center'});
             }
-            accs[idx].scrollIntoView({behavior: 'smooth'});
-          }
+          }, 150);
         };
         resultsUl.appendChild(li);
       }
     });
+    
+    if (!found) {
+      resultsUl.innerHTML = '<li style="padding: 12px; color: var(--text-light); text-align: center;">No chapters found.</li>';
+    }
   };
 
   window.toggleBookmark = async function(e, chapterId, btn) {
@@ -1228,7 +1286,15 @@ document.addEventListener('DOMContentLoaded', async () => { try {
     }
     const email = regEmailInput.value.trim();
     const password = regPasswordInput.value.trim();
-    const displayName = email.split('@')[0];
+    const displayName = regNameInput ? regNameInput.value.trim() : email.split('@')[0];
+    
+    const selectedCourses = [];
+    if (regCourseAcca && regCourseAcca.checked) selectedCourses.push('acca');
+    if (regCourseCseb && regCourseCseb.checked) selectedCourses.push('cseb');
+    if (selectedCourses.length === 0) {
+       alert("Please select at least one course to enroll in.");
+       return;
+    }
     
     try {
       registerBtn.textContent = 'Creating...';
@@ -1241,13 +1307,15 @@ document.addEventListener('DOMContentLoaded', async () => { try {
       // Update Profile Name
       await user.updateProfile({ displayName: displayName });
       
-      // Create initial Firestore Document
-      await db.collection("users").doc(user.uid).set({
-        email: email,
+      // Initialize Profile Document
+      await db.collection('users').doc(user.uid).set({
+        email: user.email,
         displayName: displayName,
+        enrolledCourses: selectedCourses,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
         history: [],
         topics: {}
-      });
+      }, { merge: true });
       
       // onAuthStateChanged will handle navigation
     } catch (error) {
@@ -1488,7 +1556,7 @@ document.addEventListener('DOMContentLoaded', async () => { try {
     if (!auth.currentUser || !tbody) return;
     
     try {
-      const snap = await db.collection('users').doc(auth.currentUser.uid).collection('studyTracker').get({ source: 'server' });
+      const snap = await db.collection('users').doc(auth.currentUser.uid).collection('studyTracker').get();
       trackerData = [];
       snap.forEach(doc => {
         trackerData.push({ id: doc.id, ...doc.data() });
@@ -1497,7 +1565,7 @@ document.addEventListener('DOMContentLoaded', async () => { try {
       window.renderTrackerTable();
     } catch (err) {
       console.error("Error loading tracker data", err);
-      tbody.innerHTML = '<tr><td colspan="8" style="color: var(--conf-red); text-align: center; padding: 20px;">Failed to load data.</td></tr>';
+      tbody.innerHTML = `<tr><td colspan="8" style="color: var(--conf-red); text-align: center; padding: 20px;">Failed to load data: ${err.message}</td></tr>`;
     }
   };
 
@@ -1525,9 +1593,9 @@ document.addEventListener('DOMContentLoaded', async () => { try {
     const pad = (n) => (n < 10 ? '0' + n : n);
     const todayStr = d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
     
+    const isSpecificSearch = query && (query.length > 3 || /\d/.test(query));
+
     let filtered = trackerData.filter(item => {
-      // Only trigger global search if the query is specific enough (>3 chars or contains a number)
-      const isSpecificSearch = query && (query.length > 3 || /\d/.test(query));
       
       if (!isSpecificSearch) {
         return item.dateStr === todayStr;
@@ -1660,3 +1728,15 @@ window.openCourseDetails = function(courseId) {
   modal.classList.remove('hidden');
   if (window.lucide) window.lucide.createIcons();
 };
+
+
+
+
+
+
+
+
+
+
+
+
