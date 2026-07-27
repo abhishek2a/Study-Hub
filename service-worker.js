@@ -1,8 +1,8 @@
-const CACHE_NAME = 'study-hub-v10';
+const CACHE_NAME = 'study-hub-v12';
 const urlsToCache = [
   './',
   './index.html',
-  './styles.css?v=16',
+  './styles.css?v=18',
   './app.js?v=46',
   './icon.jpg'
 ];
@@ -48,6 +48,8 @@ self.addEventListener('fetch', event => {
       })
   );
 });
+
+
 
 
 
