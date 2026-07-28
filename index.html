@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<script src="app.js?v=46"></script>
+<script src="app.js?v=50"></script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
   <title>Study Hub Portal</title>
@@ -36,10 +36,18 @@
   </div>
   
   <!-- UPDATE NOTIFICATION -->
-  <div id="update-toast" class="hidden">
-    <span>A new update is available!</span>
-    <button onclick="window.location.reload(true)">Reload</button>
-  </div>
+    <div id="update-toast" class="hidden">
+      <div style="text-align: center;">
+        <span style="font-size: 18px; font-weight: bold;">A new update is available! 🎉</span>
+        <div style="font-size: 14px; font-weight: normal; margin-top: 10px; color: #333333; line-height: 1.5; text-align: left;">
+          <strong>What's New:</strong><br>
+          • Rearrange and edit course resources<br>
+          • Fixed password visibility toggle bug<br>
+          • UI scaling and performance improvements
+        </div>
+      </div>
+      <button onclick="window.location.reload(true)">Reload Study Hub</button>
+    </div>
 
   <!-- LOGIN SCREEN -->
   <div id="login-screen">
@@ -546,7 +554,7 @@
         <div style="display: flex; gap: 10px; margin-bottom: 10px;">
           <input type="text" id="modal-link-title" placeholder="Link Title" class="sh-input" style="flex:1;">
           <input type="text" id="modal-link-url" placeholder="https://..." class="sh-input" style="flex:2;">
-          <button class="sh-btn" onclick="addModalLink()">Add Link</button>
+          <button class="sh-btn" id="add-link-btn" onclick="addModalLink()">Add Link</button>
         </div>
       </div>
       
@@ -613,6 +621,7 @@
   </div>
 </body>
 </html>
+
 
 
 

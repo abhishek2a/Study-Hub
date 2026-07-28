@@ -753,31 +753,125 @@ document.addEventListener('DOMContentLoaded', async () => { try {
     currentModalChapterId = null;
   };
 
+  window.editingLinkIdx = -1;
+
   window.renderModalLinks = function() {
     const list = document.getElementById('modal-links-list');
     list.innerHTML = '';
     currentModalLinks.forEach((l, idx) => {
        const li = document.createElement('li');
        li.className = 'sh-link-item';
-       li.innerHTML = `<a href="${l.url}" target="_blank">${l.title}</a>`;
+       li.style.display = 'flex';
+       li.style.justifyContent = 'space-between';
+       li.style.alignItems = 'center';
+       
+       const titleLink = document.createElement('a');
+       titleLink.href = l.url;
+       titleLink.target = '_blank';
+       titleLink.textContent = l.title;
+       titleLink.style.flex = '1';
+       titleLink.style.marginRight = '10px';
+       titleLink.style.overflow = 'hidden';
+       titleLink.style.textOverflow = 'ellipsis';
+       
+       const btnGroup = document.createElement('div');
+       btnGroup.style.display = 'flex';
+       btnGroup.style.gap = '5px';
+       
+       const upBtn = document.createElement('button');
+       upBtn.innerHTML = '<i data-lucide="arrow-up" style="width:16px;height:16px;"></i>';
+       upBtn.className = 'sh-del-btn';
+       upBtn.style.padding = '5px';
+       upBtn.onclick = () => window.moveModalLinkUp(idx);
+       if (idx === 0) upBtn.style.visibility = 'hidden';
+       
+       const downBtn = document.createElement('button');
+       downBtn.innerHTML = '<i data-lucide="arrow-down" style="width:16px;height:16px;"></i>';
+       downBtn.className = 'sh-del-btn';
+       downBtn.style.padding = '5px';
+       downBtn.onclick = () => window.moveModalLinkDown(idx);
+       if (idx === currentModalLinks.length - 1) downBtn.style.visibility = 'hidden';
+       
+       const editBtn = document.createElement('button');
+       editBtn.innerHTML = '<i data-lucide="edit-2" style="width:16px;height:16px;"></i>';
+       editBtn.className = 'sh-del-btn';
+       editBtn.style.padding = '5px';
+       editBtn.onclick = () => window.editModalLink(idx);
+       
        const delBtn = document.createElement('button');
-       delBtn.innerHTML = '<i data-lucide="trash-2"></i>';
+       delBtn.innerHTML = '<i data-lucide="trash-2" style="width:16px;height:16px;"></i>';
        delBtn.className = 'sh-del-btn';
+       delBtn.style.color = '#ef4444';
+       delBtn.style.padding = '5px';
        delBtn.onclick = () => {
          currentModalLinks.splice(idx, 1);
+         if(window.editingLinkIdx === idx) {
+            window.editingLinkIdx = -1;
+            const btn = document.getElementById('add-link-btn');
+            if(btn) btn.textContent = "Add Link";
+            document.getElementById('modal-link-title').value = '';
+            document.getElementById('modal-link-url').value = '';
+         } else if (window.editingLinkIdx > idx) {
+            window.editingLinkIdx--;
+         }
          renderModalLinks();
        };
-       li.appendChild(delBtn);
+       
+       btnGroup.appendChild(upBtn);
+       btnGroup.appendChild(downBtn);
+       btnGroup.appendChild(editBtn);
+       btnGroup.appendChild(delBtn);
+       
+       li.appendChild(titleLink);
+       li.appendChild(btnGroup);
        list.appendChild(li);
     });
     if (window.lucide) window.lucide.createIcons();
   };
 
+  window.moveModalLinkUp = function(idx) {
+    if (idx > 0) {
+      const temp = currentModalLinks[idx];
+      currentModalLinks[idx] = currentModalLinks[idx - 1];
+      currentModalLinks[idx - 1] = temp;
+      if (window.editingLinkIdx === idx) window.editingLinkIdx--;
+      else if (window.editingLinkIdx === idx - 1) window.editingLinkIdx++;
+      renderModalLinks();
+    }
+  };
+
+  window.moveModalLinkDown = function(idx) {
+    if (idx < currentModalLinks.length - 1) {
+      const temp = currentModalLinks[idx];
+      currentModalLinks[idx] = currentModalLinks[idx + 1];
+      currentModalLinks[idx + 1] = temp;
+      if (window.editingLinkIdx === idx) window.editingLinkIdx++;
+      else if (window.editingLinkIdx === idx + 1) window.editingLinkIdx--;
+      renderModalLinks();
+    }
+  };
+
+  window.editModalLink = function(idx) {
+    window.editingLinkIdx = idx;
+    const l = currentModalLinks[idx];
+    document.getElementById('modal-link-title').value = l.title;
+    document.getElementById('modal-link-url').value = l.url;
+    const btn = document.getElementById('add-link-btn');
+    if(btn) btn.textContent = "Update Link";
+  };
+
   window.addModalLink = function() {
-    const t = document.getElementById('modal-link-title').value;
-    const u = document.getElementById('modal-link-url').value;
+    const t = document.getElementById('modal-link-title').value.trim();
+    const u = document.getElementById('modal-link-url').value.trim();
     if(t && u) {
-      currentModalLinks.push({title: t, url: u});
+      if (window.editingLinkIdx !== -1) {
+        currentModalLinks[window.editingLinkIdx] = {title: t, url: u};
+        window.editingLinkIdx = -1;
+        const btn = document.getElementById('add-link-btn');
+        if(btn) btn.textContent = "Add Link";
+      } else {
+        currentModalLinks.push({title: t, url: u});
+      }
       document.getElementById('modal-link-title').value = '';
       document.getElementById('modal-link-url').value = '';
       renderModalLinks();
@@ -1731,6 +1825,8 @@ window.openCourseDetails = function(courseId) {
   modal.classList.remove('hidden');
   if (window.lucide) window.lucide.createIcons();
 };
+
+
 
 
 
