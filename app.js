@@ -374,6 +374,40 @@ document.addEventListener('DOMContentLoaded', async () => { try {
     if (window.lucide) window.lucide.createIcons();
   };
 
+  window.switchPlannerDay = function(dayNumber) {
+    const titleEl = document.getElementById('planner-header-title');
+    if (titleEl) titleEl.textContent = `Day ${dayNumber} Plan`;
+
+    [1, 2].forEach(num => {
+      const contentEl = document.getElementById(`planner-content-${num}`);
+      const btnEl = document.getElementById(`planner-btn-${num}`);
+      
+      if (contentEl) {
+        if (num === dayNumber) {
+          contentEl.classList.remove('hidden');
+          contentEl.style.display = 'block';
+        } else {
+          contentEl.classList.add('hidden');
+          contentEl.style.display = 'none';
+        }
+      }
+      
+      if (btnEl) {
+        if (num === dayNumber) {
+          btnEl.style.background = 'var(--acca-red)';
+          btnEl.style.color = 'white';
+          btnEl.style.border = '1px solid var(--acca-red)';
+        } else {
+          btnEl.style.background = 'var(--panel-bg)';
+          btnEl.style.color = 'var(--text-main)';
+          btnEl.style.border = '1px solid var(--border-color)';
+        }
+      }
+    });
+
+    if (window.lucide) window.lucide.createIcons();
+  };
+
   function renderQuestionBanks() {
      const qbList = document.getElementById('qb-list');
      if (!qbList) return;
@@ -1303,6 +1337,7 @@ document.addEventListener('DOMContentLoaded', async () => { try {
       startStudyTimer();
     } else {
       currentUserIsAdmin = false;
+      currentSessionId = null;
       showScreen('login');
       stopStudyTimer();
     }
@@ -1369,6 +1404,32 @@ document.addEventListener('DOMContentLoaded', async () => { try {
       }
     }
   });
+
+  window.signOutUser = async function() {
+    try {
+      if (auth.currentUser && currentSessionId) {
+        await db.collection("users").doc(auth.currentUser.uid).collection("sessions").doc(currentSessionId).update({
+          logoutTime: firebase.firestore.FieldValue.serverTimestamp()
+        }).catch(console.error);
+        currentSessionId = null;
+      }
+    } catch (err) {
+      console.error("Error updating session on logout:", err);
+    }
+    try {
+      await auth.signOut();
+    } catch (error) {
+      console.error("Sign out error:", error);
+      alert("Error signing out: " + error.message);
+    }
+  };
+
+  if (navLogout) {
+    navLogout.addEventListener('click', (e) => {
+      e.preventDefault();
+      window.signOutUser();
+    });
+  }
 
   // --- Auth Navigation ---
   if (linkCreateAccount) {

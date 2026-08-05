@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<script src="app.js?v=51"></script>
+<script src="app.js?v=53"></script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
   <title>Study Hub Portal</title>
@@ -353,11 +353,11 @@
 
         <!-- Day Planner Tab -->
         <div id="tab-planner" class="hidden sh-content-wrapper" style="padding: 20px;">
-          <div style="background: var(--acca-red-gradient, linear-gradient(135deg, #E3000F 0%, #9B000A 100%)); padding: 25px; border-radius: 12px; color: white; margin-bottom: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.15);">
+          <div style="background: var(--acca-red-gradient, linear-gradient(135deg, #E3000F 0%, #9B000A 100%)); padding: 25px; border-radius: 12px; color: white; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.15);">
             <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
               <div>
                 <span style="background: rgba(255,255,255,0.2); padding: 4px 10px; border-radius: 4px; font-size: 12px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">ACCA 30 Days Completion Strategy</span>
-                <h1 style="margin: 10px 0 0 0; font-size: 28px; color: white; border: none; padding: 0;">Day 1 Plan</h1>
+                <h1 id="planner-header-title" style="margin: 10px 0 0 0; font-size: 28px; color: white; border: none; padding: 0;">Day 2 Plan</h1>
               </div>
               <div style="background: rgba(0,0,0,0.2); padding: 8px 15px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.3);">
                 <strong style="font-size: 16px; display: flex; align-items: center; gap: 6px;"><i data-lucide="book-open" style="width: 18px;"></i> FR - Financial Reporting</strong>
@@ -365,67 +365,145 @@
             </div>
           </div>
 
-          <div class="sh-grid-2" style="gap: 20px; margin-bottom: 30px;">
-            <div class="hub-card" style="border-top: 4px solid #3b82f6;">
-              <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px; color: #3b82f6;">
-                <i data-lucide="target" style="width: 22px; height: 22px;"></i>
-                <h3 style="margin: 0; font-size: 16px; color: var(--text-main);">Day 1 Focus</h3>
-              </div>
-              <p style="font-size: 17px; font-weight: 600; margin: 0; color: var(--text-main);">Learn framework & concepts</p>
-            </div>
+          <!-- Day Selection Pills -->
+          <div style="display: flex; gap: 10px; margin-bottom: 25px; flex-wrap: wrap;">
+            <button id="planner-btn-1" class="sh-btn" style="background: var(--panel-bg); color: var(--text-main); border: 1px solid var(--border-color); font-weight: 600;" onclick="window.switchPlannerDay(1)">Day 1 Plan</button>
+            <button id="planner-btn-2" class="sh-btn" style="background: var(--acca-red); color: white; border: 1px solid var(--acca-red); font-weight: 600;" onclick="window.switchPlannerDay(2)">Day 2 Plan (Latest)</button>
+          </div>
 
-            <div class="hub-card" style="border-top: 4px solid #10b981;">
-              <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px; color: #10b981;">
-                <i data-lucide="book" style="width: 22px; height: 22px;"></i>
-                <h3 style="margin: 0; font-size: 16px; color: var(--text-main);">Topic / Chapter</h3>
+          <!-- DAY 1 CONTENT -->
+          <div id="planner-content-1" class="hidden" style="display: none;">
+            <div class="sh-grid-2" style="gap: 20px; margin-bottom: 30px;">
+              <div class="hub-card" style="border-top: 4px solid #3b82f6;">
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px; color: #3b82f6;">
+                  <i data-lucide="target" style="width: 22px; height: 22px;"></i>
+                  <h3 style="margin: 0; font-size: 16px; color: var(--text-main);">Day 1 Focus</h3>
+                </div>
+                <p style="font-size: 17px; font-weight: 600; margin: 0; color: var(--text-main);">Learn framework & concepts</p>
               </div>
-              <p style="font-size: 16px; font-weight: 600; margin: 0; color: var(--text-main);">Chapter 1: Regulatory framework & Conceptual framework</p>
-            </div>
 
-            <div class="hub-card" style="border-top: 4px solid #f59e0b;">
-              <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px; color: #f59e0b;">
-                <i data-lucide="clock" style="width: 22px; height: 22px;"></i>
-                <h3 style="margin: 0; font-size: 16px; color: var(--text-main);">Study Hours</h3>
+              <div class="hub-card" style="border-top: 4px solid #10b981;">
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px; color: #10b981;">
+                  <i data-lucide="book" style="width: 22px; height: 22px;"></i>
+                  <h3 style="margin: 0; font-size: 16px; color: var(--text-main);">Topic / Chapter</h3>
+                </div>
+                <p style="font-size: 16px; font-weight: 600; margin: 0; color: var(--text-main);">Chapter 1: Regulatory framework & Conceptual framework</p>
               </div>
-              <p style="font-size: 18px; font-weight: bold; margin: 0; color: var(--text-main);">1.5 - 2 hrs</p>
-            </div>
 
-            <div class="hub-card" style="border-top: 4px solid #8b5cf6;">
-              <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px; color: #8b5cf6;">
-                <i data-lucide="check-circle-2" style="width: 22px; height: 22px;"></i>
-                <h3 style="margin: 0; font-size: 16px; color: var(--text-main);">Practice Target</h3>
+              <div class="hub-card" style="border-top: 4px solid #f59e0b;">
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px; color: #f59e0b;">
+                  <i data-lucide="clock" style="width: 22px; height: 22px;"></i>
+                  <h3 style="margin: 0; font-size: 16px; color: var(--text-main);">Study Hours</h3>
+                </div>
+                <p style="font-size: 18px; font-weight: bold; margin: 0; color: var(--text-main);">1.5 - 2 hrs</p>
               </div>
-              <p style="font-size: 16px; margin: 0; color: var(--text-main);"><strong>20 MCQs</strong> <span style="color: var(--text-light); font-size: 14px;">(Numericals: N/A - Conceptual Focus)</span></p>
-            </div>
 
-            <div class="hub-card" style="border-top: 4px solid #ec4899;">
-              <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px; color: #ec4899;">
-                <i data-lucide="star" style="width: 22px; height: 22px;"></i>
-                <h3 style="margin: 0; font-size: 16px; color: var(--text-main);">Key Areas to Focus</h3>
+              <div class="hub-card" style="border-top: 4px solid #8b5cf6;">
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px; color: #8b5cf6;">
+                  <i data-lucide="check-circle-2" style="width: 22px; height: 22px;"></i>
+                  <h3 style="margin: 0; font-size: 16px; color: var(--text-main);">Practice Target</h3>
+                </div>
+                <p style="font-size: 16px; margin: 0; color: var(--text-main);"><strong>20 MCQs</strong> <span style="color: var(--text-light); font-size: 14px;">(Numericals: N/A - Conceptual Focus)</span></p>
               </div>
-              <ul style="margin: 0; padding-left: 20px; color: var(--text-main); font-size: 15px; line-height: 1.6;">
-                <li><strong>IFRS framework</strong></li>
-                <li><strong>Qualitative characteristics</strong></li>
-              </ul>
-            </div>
 
-            <div class="hub-card" style="border-top: 4px solid #06b6d4;">
-              <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px; color: #06b6d4;">
-                <i data-lucide="file-text" style="width: 22px; height: 22px;"></i>
-                <h3 style="margin: 0; font-size: 16px; color: var(--text-main);">Study Material & Tasks</h3>
+              <div class="hub-card" style="border-top: 4px solid #ec4899;">
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px; color: #ec4899;">
+                  <i data-lucide="star" style="width: 22px; height: 22px;"></i>
+                  <h3 style="margin: 0; font-size: 16px; color: var(--text-main);">Key Areas to Focus</h3>
+                </div>
+                <ul style="margin: 0; padding-left: 20px; color: var(--text-main); font-size: 15px; line-height: 1.6;">
+                  <li><strong>IFRS framework</strong></li>
+                  <li><strong>Qualitative characteristics</strong></li>
+                </ul>
               </div>
-              <p style="font-size: 14px; margin: 0 0 10px 0; color: var(--text-light);">Material: <strong>Textbook PDF + Notes</strong></p>
-              <div style="display: flex; flex-direction: column; gap: 8px; border-top: 1px solid var(--border-color); padding-top: 10px;">
-                <strong style="font-size: 13px; color: var(--text-main); text-transform: uppercase;">End of Day Task List:</strong>
-                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 14px; color: var(--text-main);">
-                  <input type="checkbox" style="width: 16px; height: 16px; cursor: pointer;"> Revise notes
-                </label>
-                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 14px; color: var(--text-main);">
-                  <input type="checkbox" style="width: 16px; height: 16px; cursor: pointer;"> Solve 20 MCQs
-                </label>
-                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 14px; color: var(--text-main);">
-                  <input type="checkbox" style="width: 16px; height: 16px; cursor: pointer;"> Make short summary
-                </label>
+
+              <div class="hub-card" style="border-top: 4px solid #06b6d4;">
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px; color: #06b6d4;">
+                  <i data-lucide="file-text" style="width: 22px; height: 22px;"></i>
+                  <h3 style="margin: 0; font-size: 16px; color: var(--text-main);">Study Material & Tasks</h3>
+                </div>
+                <p style="font-size: 14px; margin: 0 0 10px 0; color: var(--text-light);">Material: <strong>Textbook PDF + Notes</strong></p>
+                <div style="display: flex; flex-direction: column; gap: 8px; border-top: 1px solid var(--border-color); padding-top: 10px;">
+                  <strong style="font-size: 13px; color: var(--text-main); text-transform: uppercase;">End of Day Task List:</strong>
+                  <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 14px; color: var(--text-main);">
+                    <input type="checkbox" style="width: 16px; height: 16px; cursor: pointer;"> Revise notes
+                  </label>
+                  <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 14px; color: var(--text-main);">
+                    <input type="checkbox" style="width: 16px; height: 16px; cursor: pointer;"> Solve 20 MCQs
+                  </label>
+                  <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 14px; color: var(--text-main);">
+                    <input type="checkbox" style="width: 16px; height: 16px; cursor: pointer;"> Make short summary
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- DAY 2 CONTENT (Active by default) -->
+          <div id="planner-content-2">
+            <div class="sh-grid-2" style="gap: 20px; margin-bottom: 30px;">
+              <div class="hub-card" style="border-top: 4px solid #3b82f6;">
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px; color: #3b82f6;">
+                  <i data-lucide="target" style="width: 22px; height: 22px;"></i>
+                  <h3 style="margin: 0; font-size: 16px; color: var(--text-main);">Day 2 Focus</h3>
+                </div>
+                <p style="font-size: 17px; font-weight: 600; margin: 0; color: var(--text-main);">Understand conceptual framework basics</p>
+              </div>
+
+              <div class="hub-card" style="border-top: 4px solid #10b981;">
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px; color: #10b981;">
+                  <i data-lucide="book" style="width: 22px; height: 22px;"></i>
+                  <h3 style="margin: 0; font-size: 16px; color: var(--text-main);">Topic / Chapter</h3>
+                </div>
+                <p style="font-size: 16px; font-weight: 600; margin: 0; color: var(--text-main);">Chapter 2: Qualitative characteristics of FS</p>
+              </div>
+
+              <div class="hub-card" style="border-top: 4px solid #f59e0b;">
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px; color: #f59e0b;">
+                  <i data-lucide="clock" style="width: 22px; height: 22px;"></i>
+                  <h3 style="margin: 0; font-size: 16px; color: var(--text-main);">Study Hours</h3>
+                </div>
+                <p style="font-size: 18px; font-weight: bold; margin: 0; color: var(--text-main);">1.5 - 2 hrs</p>
+              </div>
+
+              <div class="hub-card" style="border-top: 4px solid #8b5cf6;">
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px; color: #8b5cf6;">
+                  <i data-lucide="check-circle-2" style="width: 22px; height: 22px;"></i>
+                  <h3 style="margin: 0; font-size: 16px; color: var(--text-main);">Practice Target</h3>
+                </div>
+                <p style="font-size: 16px; margin: 0; color: var(--text-main);"><strong>20 MCQs</strong> <span style="color: var(--text-light); font-size: 14px;">(Numericals: N/A - Conceptual Focus)</span></p>
+              </div>
+
+              <div class="hub-card" style="border-top: 4px solid #ec4899;">
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px; color: #ec4899;">
+                  <i data-lucide="star" style="width: 22px; height: 22px;"></i>
+                  <h3 style="margin: 0; font-size: 16px; color: var(--text-main);">Key Areas to Focus</h3>
+                </div>
+                <ul style="margin: 0; padding-left: 20px; color: var(--text-main); font-size: 15px; line-height: 1.6;">
+                  <li><strong>Enhancing quality</strong></li>
+                  <li><strong>Fundamental qualities</strong></li>
+                  <li><strong>Constraints</strong></li>
+                </ul>
+              </div>
+
+              <div class="hub-card" style="border-top: 4px solid #06b6d4;">
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px; color: #06b6d4;">
+                  <i data-lucide="file-text" style="width: 22px; height: 22px;"></i>
+                  <h3 style="margin: 0; font-size: 16px; color: var(--text-main);">Study Material & Tasks</h3>
+                </div>
+                <p style="font-size: 14px; margin: 0 0 10px 0; color: var(--text-light);">Material: <strong>Textbook PDF + Notes</strong></p>
+                <div style="display: flex; flex-direction: column; gap: 8px; border-top: 1px solid var(--border-color); padding-top: 10px;">
+                  <strong style="font-size: 13px; color: var(--text-main); text-transform: uppercase;">End of Day Task List:</strong>
+                  <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 14px; color: var(--text-main);">
+                    <input type="checkbox" style="width: 16px; height: 16px; cursor: pointer;"> Revise notes
+                  </label>
+                  <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 14px; color: var(--text-main);">
+                    <input type="checkbox" style="width: 16px; height: 16px; cursor: pointer;"> Solve 20 MCQs
+                  </label>
+                  <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 14px; color: var(--text-main);">
+                    <input type="checkbox" style="width: 16px; height: 16px; cursor: pointer;"> Make short summary
+                  </label>
+                </div>
               </div>
             </div>
           </div>
@@ -608,7 +686,7 @@
                 <strong style="color: var(--acca-red);">Sign Out</strong>
                 <p style="margin: 0; font-size: 13px; color: var(--text-light);">Log out of your account on this device.</p>
               </div>
-              <button id="nav-logout" class="sh-btn" style="background: #FEE2E2; color: #DC2626; border: none;">Sign Out</button>
+              <button id="nav-logout" class="sh-btn" style="background: #FEE2E2; color: #DC2626; border: none; cursor: pointer;" onclick="window.signOutUser()">Sign Out</button>
             </div>
           </div>
           <p style="text-align: center; color: var(--text-light); margin-top: 40px; font-size: 12px; margin-bottom: 20px;">Version 1.0 (Build 1)</p>
