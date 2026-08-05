@@ -293,6 +293,7 @@ document.addEventListener('DOMContentLoaded', async () => { try {
       const profileTab = document.getElementById('tab-profile');
       const contentWrapper = document.getElementById('sh-content-wrapper');
       const qbTab = document.getElementById('tab-qb');
+      const plannerTab = document.getElementById('tab-planner');
       
       document.querySelectorAll('.sh-nav li').forEach(li => li.classList.remove('active'));
       
@@ -302,6 +303,7 @@ document.addEventListener('DOMContentLoaded', async () => { try {
       }
       const trackerTab = document.getElementById('tab-tracker');
        if (trackerTab) { trackerTab.classList.add('hidden'); trackerTab.style.display = 'none'; }
+       if (plannerTab) { plannerTab.classList.add('hidden'); plannerTab.style.display = 'none'; }
        if (qbTab) {
          qbTab.classList.add('hidden');
          qbTab.style.display = 'none';
@@ -324,10 +326,12 @@ document.addEventListener('DOMContentLoaded', async () => { try {
     const contentWrapper = document.getElementById('sh-content-wrapper');
     const qbTab = document.getElementById('tab-qb');
     const trackerTab = document.getElementById('tab-tracker');
+    const plannerTab = document.getElementById('tab-planner');
     
     if (profileTab) { profileTab.classList.add('hidden'); profileTab.style.display = 'none'; }
     if (qbTab) { qbTab.classList.add('hidden'); qbTab.style.display = 'none'; }
     if (trackerTab) { trackerTab.classList.add('hidden'); trackerTab.style.display = 'none'; }
+    if (plannerTab) { plannerTab.classList.add('hidden'); plannerTab.style.display = 'none'; }
     if (contentWrapper) { contentWrapper.classList.remove('hidden'); contentWrapper.style.display = 'block'; }
   };
 
@@ -340,13 +344,34 @@ document.addEventListener('DOMContentLoaded', async () => { try {
     const contentWrapper = document.getElementById('sh-content-wrapper');
     const qbTab = document.getElementById('tab-qb');
     const trackerTab = document.getElementById('tab-tracker');
+    const plannerTab = document.getElementById('tab-planner');
     
     if (profileTab) { profileTab.classList.add('hidden'); profileTab.style.display = 'none'; }
     if (contentWrapper) { contentWrapper.classList.add('hidden'); contentWrapper.style.display = 'none'; }
     if (trackerTab) { trackerTab.classList.add('hidden'); trackerTab.style.display = 'none'; }
+    if (plannerTab) { plannerTab.classList.add('hidden'); plannerTab.style.display = 'none'; }
     if (qbTab) { qbTab.classList.remove('hidden'); qbTab.style.display = 'block'; }
     
     renderQuestionBanks();
+  };
+
+  window.showDayPlanner = function() {
+    document.querySelectorAll('.sh-nav li').forEach(li => li.classList.remove('active'));
+    const navPl = document.getElementById('nav-planner');
+    if(navPl) navPl.classList.add('active');
+    
+    const profileTab = document.getElementById('tab-profile');
+    const contentWrapper = document.getElementById('sh-content-wrapper');
+    const qbTab = document.getElementById('tab-qb');
+    const trackerTab = document.getElementById('tab-tracker');
+    const plannerTab = document.getElementById('tab-planner');
+    
+    if (profileTab) { profileTab.classList.add('hidden'); profileTab.style.display = 'none'; }
+    if (contentWrapper) { contentWrapper.classList.add('hidden'); contentWrapper.style.display = 'none'; }
+    if (qbTab) { qbTab.classList.add('hidden'); qbTab.style.display = 'none'; }
+    if (trackerTab) { trackerTab.classList.add('hidden'); trackerTab.style.display = 'none'; }
+    if (plannerTab) { plannerTab.classList.remove('hidden'); plannerTab.style.display = 'block'; }
+    if (window.lucide) window.lucide.createIcons();
   };
 
   function renderQuestionBanks() {
@@ -1412,142 +1437,54 @@ document.addEventListener('DOMContentLoaded', async () => { try {
         createdAt: firebase.firestore.FieldValue.serverTimestamp(),
         history: [],
         topics: {}
-      }, { merge: true });
+      });
       
-      // onAuthStateChanged will handle navigation
+      alert('Registration successful! Please log in.');
+      showScreen('login');
+      registerForm.reset();
     } catch (error) {
-      alert(error.message);
       console.error(error);
+      alert('Registration Failed: ' + error.message);
     } finally {
-      registerBtn.textContent = 'Create Account';
-      registerBtn.disabled = false;
-    }
-  });
-
-  // --- Forgot Password Logic ---
-  function validateForgotForm() {
-    if (forgotEmailInput.value.trim()) {
-      forgotBtn.disabled = false;
-      forgotBtn.classList.add('active');
-    } else {
-      forgotBtn.disabled = true;
-      forgotBtn.classList.remove('active');
-    }
-  }
-
-  forgotEmailInput.addEventListener('input', validateForgotForm);
-
-  forgotForm.addEventListener('submit', (e) => {
-    e.preventDefault();
-    alert(`Password reset link sent to ${forgotEmailInput.value}`);
-    showScreen('login');
-  });
-
-  // --- Sidebar Navigation ---
-  const navTabs = document.querySelectorAll('.nav-tab');
-  const hubTabs = document.querySelectorAll('.hub-tab');
-
-  navTabs.forEach(tab => {
-    tab.addEventListener('click', (e) => {
-      e.preventDefault();
-      
-      // Update active nav link
-      navTabs.forEach(t => t.classList.remove('active'));
-      tab.classList.add('active');
-
-      // Hide all panels
-      hubTabs.forEach(panel => panel.classList.add('hidden'));
-
-      // Show target panel
-      const targetId = tab.getAttribute('data-target');
-      document.getElementById(targetId).classList.remove('hidden');
-
-      if (targetId === 'tab-profile') {
-        renderAnalytics();
+      if (registerBtn) {
+        registerBtn.textContent = 'Create Account';
+        registerBtn.disabled = false;
       }
-    });
+    }
   });
 
-  if(navLogout) {
-    navLogout.addEventListener('click', async (e) => {
+  if (forgotForm) {
+    forgotForm.addEventListener('submit', async (e) => {
       e.preventDefault();
+      const email = forgotEmailInput ? forgotEmailInput.value.trim() : '';
+      if (!email) {
+        alert('Please enter your registered email.');
+        return;
+      }
       try {
-        if (currentSessionId && auth.currentUser) {
-          await db.collection("users").doc(auth.currentUser.uid).collection("sessions").doc(currentSessionId).update({
-            logoutTime: firebase.firestore.FieldValue.serverTimestamp()
-          }).catch(() => {});
-          currentSessionId = null;
+        if (forgotBtn) {
+          forgotBtn.textContent = 'Sending...';
+          forgotBtn.disabled = true;
         }
-        await auth.signOut();
-        usernameInput.value = '';
-        passwordInput.value = '';
-        validateForm();
+        await auth.sendPasswordResetEmail(email);
+        alert('Password reset email sent! Please check your inbox.');
         showScreen('login');
-      } catch (error) {
-        console.error('Error signing out', error);
-      }
-    });
-  }
-
-  // --- Profile Name Editing ---
-  const editNameBtn = document.getElementById('edit-name-btn');
-  const saveNameBtn = document.getElementById('save-name-btn');
-  const profileNameDisplay = document.getElementById('profile-name-display');
-  const profileNameEdit = document.getElementById('profile-name-edit');
-  const profileNameInput = document.getElementById('profile-name-input');
-  const userDisplayName = document.getElementById('user-display-name');
-
-  if(editNameBtn) {
-    editNameBtn.addEventListener('click', () => {
-      profileNameDisplay.classList.add('hidden');
-      profileNameEdit.classList.remove('hidden');
-      editNameBtn.classList.add('hidden');
-    });
-  }
-
-  if(saveNameBtn) {
-    saveNameBtn.addEventListener('click', async () => {
-      const newName = profileNameInput.value.trim();
-      const user = auth.currentUser;
-      
-      if(newName && user) {
-        try {
-          saveNameBtn.textContent = 'Saving...';
-          await user.updateProfile({ displayName: newName });
-          await db.collection("users").doc(user.uid).update({ displayName: newName });
-          
-          profileNameDisplay.textContent = newName;
-          userDisplayName.textContent = newName;
-        } catch (error) {
-          console.error("Error updating profile", error);
-          alert("Failed to update name.");
-        } finally {
-          saveNameBtn.textContent = 'Save Name';
+        forgotForm.reset();
+      } catch (err) {
+        console.error(err);
+        alert('Reset Failed: ' + err.message);
+      } finally {
+        if (forgotBtn) {
+          forgotBtn.textContent = 'Send Reset Link';
+          forgotBtn.disabled = false;
         }
       }
-      
-      profileNameDisplay.classList.remove('hidden');
-      profileNameEdit.classList.add('hidden');
-      editNameBtn.classList.remove('hidden');
     });
   }
-
-  if (exitResultBtn) {
-    exitResultBtn.addEventListener('click', () => {
-      showScreen('study');
-    });
-  }
-
-  window.addEventListener('beforeunload', () => {
-    if (currentSessionId && auth.currentUser) {
-      db.collection('users').doc(auth.currentUser.uid).collection('sessions').doc(currentSessionId).update({
-        logoutTime: firebase.firestore.FieldValue.serverTimestamp()
-      }).catch(() => {});
-    }
-  });
 
   // --- Study Tracker Logic ---
-  let trackerData = [];  let trackerSortCol = 'date';
+  let trackerData = [];
+  let trackerSortCol = 'date';
   let trackerSortAsc = false;
 
   window.toggleTracker = function() {
@@ -1555,6 +1492,7 @@ document.addEventListener('DOMContentLoaded', async () => { try {
       const trackerTab = document.getElementById('tab-tracker');
       const profileTab = document.getElementById('tab-profile');
       const qbTab = document.getElementById('tab-qb');
+      const plannerTab = document.getElementById('tab-planner');
       const contentWrapper = document.getElementById('sh-content-wrapper');
       
       if (!trackerTab) { alert('Tracker tab not found in DOM'); return; }
@@ -1583,6 +1521,7 @@ document.addEventListener('DOMContentLoaded', async () => { try {
         if (contentWrapper) { contentWrapper.classList.add('hidden'); contentWrapper.style.display = 'none'; }
         if (qbTab) { qbTab.classList.add('hidden'); qbTab.style.display = 'none'; }
         if (profileTab) { profileTab.classList.add('hidden'); profileTab.style.display = 'none'; }
+        if (plannerTab) { plannerTab.classList.add('hidden'); plannerTab.style.display = 'none'; }
         
         trackerTab.classList.remove('hidden');
         trackerTab.style.display = 'block';
@@ -1590,8 +1529,8 @@ document.addEventListener('DOMContentLoaded', async () => { try {
         trackerTab.style.visibility = 'visible';
         
         const subjectEl = document.getElementById('track-subject');
-        if (subjectEl) subjectEl.value = (typeof currentCourse === 'string' && currentCourse === 'acca') ? 'Financial Reporting' : (currentCourse || '');
-           
+        if (subjectEl) subjectEl.value = currentCourse === 'acca' ? 'Financial Reporting (FR)' : 'Kerala Co-operative Service Examination Board (CSEB)';
+        
         const chapterEl = document.getElementById('track-chapter');
         if (chapterEl && typeof courseStructure !== 'undefined' && courseStructure[currentCourse]) {
             chapterEl.innerHTML = '<option value="">Select Chapter</option>';
