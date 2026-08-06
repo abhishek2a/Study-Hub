@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<script src="app.js?v=53"></script>
+<script src="app.js?v=55"></script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
   <title>Study Hub Portal</title>
   <!-- Favicon -->
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
-  <link rel="stylesheet" href="styles.css?v=18">
+  <link rel="stylesheet" href="styles.css?v=19">
   <script src="https://unpkg.com/lucide@latest"></script>
   
   <!-- Quill Word Processor -->
@@ -285,6 +285,7 @@
           <li id="nav-chapters" class="active" onclick="showStudyChapters()"><i data-lucide="book-open"></i> Chapters</li>
           <li id="nav-qb" onclick="showQuestionBanks()"><i data-lucide="database"></i> Question Banks</li>
           <li id="nav-planner" onclick="showDayPlanner()"><i data-lucide="calendar"></i> Day Planner</li>
+          <li id="nav-examchart" onclick="showExamChart()"><i data-lucide="pie-chart"></i> FR Exam Chart</li>
           <li id="nav-tracker" onclick="window.toggleTracker()"><i data-lucide="target"></i> Study Tracker</li>
           <li onclick="toggleSearch()"><i data-lucide="search"></i> Search</li>
         </ul>
@@ -293,6 +294,26 @@
       <!-- Main Content -->
       <div class="sh-main">
         <div id="sh-content-wrapper" class="sh-content-wrapper">
+          <!-- Discovery Banner for FR Exam Chart & Dec 10 Strategy -->
+          <div id="fr-exam-banner" style="background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%); border: 1px solid rgba(255,255,255,0.15); border-left: 4px solid var(--acca-red); border-radius: 12px; padding: 18px 22px; margin-bottom: 25px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; box-shadow: 0 8px 20px rgba(0,0,0,0.15);">
+            <div style="display: flex; align-items: center; gap: 15px;">
+              <div style="background: rgba(227, 0, 15, 0.25); width: 48px; height: 48px; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: #ff334b; box-shadow: 0 2px 8px rgba(227,0,15,0.3);">
+                <i data-lucide="award" style="width: 26px; height: 26px;"></i>
+              </div>
+              <div>
+                <div>
+                  <span style="background: var(--acca-red); color: white; padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px;">DEC 10 EXAM PREP</span>
+                  <span class="exam-countdown-badge" style="background: #10b981; color: white; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 800; margin-left: 8px; box-shadow: 0 2px 6px rgba(16,185,129,0.3);">⏳ Calculating Days to Dec 10 Exam...</span>
+                </div>
+                <strong style="color: #ffffff; font-size: 17px; display: block; margin: 6px 0 3px 0;">Pass ACCA FR on December 10th, 2026 — Strategy & Formula Chart!</strong>
+                <span style="color: #cbd5e1; font-size: 13px;">Plan Smart, Study Smart! Includes Dec 10 Strategy roadmap, Complete 19-Standard Formula Chart & Syllabus guide.</span>
+              </div>
+            </div>
+            <button onclick="showExamChart()" class="sh-btn" style="background: var(--acca-red); color: white; border: none; padding: 10px 20px; font-weight: 700; border-radius: 8px; cursor: pointer; display: flex; align-items: center; gap: 8px; white-space: nowrap; box-shadow: 0 4px 12px rgba(227,0,15,0.4); transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.04)'" onmouseout="this.style.transform='scale(1)'">
+              <i data-lucide="external-link" style="width: 16px; height: 16px;"></i> Open Chart & Strategy
+            </button>
+          </div>
+
           <h1 class="sh-page-title">Chapters</h1>
           
           <!-- Sub Tabs -->
@@ -536,6 +557,462 @@
                 <div style="font-size: 12px; color: var(--text-light); text-transform: uppercase; font-weight: bold;">Strategy Focus</div>
                 <div style="font-size: 15px; font-weight: bold; color: var(--text-main);">Consistency • Revision</div>
               </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- FR Exam Chart & Formula Sheet Tab -->
+        <div id="tab-examchart" class="hidden sh-content-wrapper" style="padding: 20px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; margin-bottom: 25px;">
+            <div>
+              <h1 class="sh-page-title" style="margin-bottom: 5px; display: flex; align-items: center; gap: 10px;">
+                <i data-lucide="pie-chart" style="color: var(--acca-red);"></i> ACCA FR Complete Study Guide & Formulas
+              </h1>
+              <p style="color: var(--text-light); font-size: 14px; margin: 0;">Everything you need to master Financial Reporting for the December 10th, 2026 exam.</p>
+            </div>
+            <div style="background: rgba(227, 0, 15, 0.08); border: 1px solid var(--acca-red); padding: 8px 16px; border-radius: 20px; font-weight: 700; font-size: 13px; color: var(--acca-red); display: flex; align-items: center; gap: 8px;">
+              <i data-lucide="calendar" style="width: 16px; height: 16px;"></i> Exam: Dec 10, 2026 (<span id="chart-countdown-text">Calculating...</span>)
+            </div>
+          </div>
+
+          <!-- Section Tabs -->
+          <div style="display: flex; gap: 10px; margin-bottom: 25px; border-bottom: 2px solid var(--border-color); padding-bottom: 15px; overflow-x: auto;">
+            <button id="chart-tab-btn-1" onclick="switchExamChartTab(1)" class="sh-btn" style="background: var(--acca-red); color: white; border: none; padding: 10px 20px; border-radius: 20px; font-weight: 600; white-space: nowrap; cursor: pointer;">🏆 Smart Strategy (70+ Target)</button>
+            <button id="chart-tab-btn-2" onclick="switchExamChartTab(2)" class="sh-btn" style="background: var(--panel-bg); color: var(--text-main); border: 1px solid var(--border-color); padding: 10px 20px; border-radius: 20px; font-weight: 600; white-space: nowrap; cursor: pointer;">📊 Complete Syllabus & Pattern</button>
+            <button id="chart-tab-btn-3" onclick="switchExamChartTab(3)" class="sh-btn" style="background: var(--panel-bg); color: var(--text-main); border: 1px solid var(--border-color); padding: 10px 20px; border-radius: 20px; font-weight: 600; white-space: nowrap; cursor: pointer;">🧮 19-Standard Formula Chart</button>
+          </div>
+
+          <!-- TAB 1: Smart Strategy to Score 70+ -->
+          <div id="chart-content-1">
+            <div class="sh-grid-2" style="margin-bottom: 25px;">
+              <!-- Section Strategy Card -->
+              <div class="hub-card" style="border-top: 4px solid #10b981;">
+                <h3 style="margin-top: 0; display: flex; align-items: center; gap: 8px; color: var(--text-main);"><i data-lucide="target" style="color: #10b981;"></i> Section Strategy (Target 70+ Marks)</h3>
+                <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 15px;">
+                  <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 15px; background: rgba(16, 185, 129, 0.1); border-radius: 8px;">
+                    <div><strong style="color: var(--text-main);">Section A (30 Marks)</strong><div style="font-size: 12px; color: var(--text-light);">15 OTQs across entire syllabus</div></div>
+                    <span style="background: #10b981; color: white; padding: 4px 10px; border-radius: 6px; font-weight: 800;">Target: 25+/30</span>
+                  </div>
+                  <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 15px; background: rgba(59, 130, 246, 0.1); border-radius: 8px;">
+                    <div><strong style="color: var(--text-main);">Section B (30 Marks)</strong><div style="font-size: 12px; color: var(--text-light);">3 Case Scenarios (5 OTQs each)</div></div>
+                    <span style="background: #3b82f6; color: white; padding: 4px 10px; border-radius: 6px; font-weight: 800;">Target: 24+/30</span>
+                  </div>
+                  <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 15px; background: rgba(227, 0, 15, 0.1); border-radius: 8px;">
+                    <div><strong style="color: var(--text-main);">Section C (40 Marks)</strong><div style="font-size: 12px; color: var(--text-light);">2 CRQs (20 marks each: FS, Consolidation & Ratios)</div></div>
+                    <span style="background: var(--acca-red); color: white; padding: 4px 10px; border-radius: 6px; font-weight: 800;">Target: 30+/40</span>
+                  </div>
+                  <div style="text-align: center; padding: 12px; background: var(--panel-bg); border: 2px dashed var(--acca-red); border-radius: 8px; font-weight: 800; font-size: 16px; color: var(--acca-red);">
+                    🏆 Total Target Score: 70+ Marks!
+                  </div>
+                </div>
+              </div>
+
+              <!-- Most Important Topics Card -->
+              <div class="hub-card" style="border-top: 4px solid #f59e0b;">
+                <h3 style="margin-top: 0; display: flex; align-items: center; gap: 8px; color: var(--text-main);"><i data-lucide="star" style="color: #f59e0b;"></i> Most Important Topics (Focus More)</h3>
+                <ul style="list-style: none; padding: 0; margin: 15px 0 0 0; display: flex; flex-direction: column; gap: 10px;">
+                  <li style="display: flex; justify-content: space-between; align-items: center; font-size: 14px;"><span style="font-weight: 600;">Consolidation (IFRS 10 & 3)</span><span style="color: #f59e0b; font-size: 12px;">⭐⭐⭐⭐⭐</span></li>
+                  <li style="display: flex; justify-content: space-between; align-items: center; font-size: 14px;"><span style="font-weight: 600;">Single Entity Financial Statements</span><span style="color: #f59e0b; font-size: 12px;">⭐⭐⭐⭐⭐</span></li>
+                  <li style="display: flex; justify-content: space-between; align-items: center; font-size: 14px;"><span style="font-weight: 600;">IFRS 15 Revenue from Contracts</span><span style="color: #f59e0b; font-size: 12px;">⭐⭐⭐⭐⭐</span></li>
+                  <li style="display: flex; justify-content: space-between; align-items: center; font-size: 14px;"><span style="font-weight: 600;">IAS 16 Property, Plant & Equipment</span><span style="color: #f59e0b; font-size: 12px;">⭐⭐⭐⭐⭐</span></li>
+                  <li style="display: flex; justify-content: space-between; align-items: center; font-size: 14px;"><span style="font-weight: 600;">IAS 7 Statement of Cash Flows</span><span style="color: #f59e0b; font-size: 12px;">⭐⭐⭐⭐⭐</span></li>
+                  <li style="display: flex; justify-content: space-between; align-items: center; font-size: 14px;"><span style="font-weight: 600;">IAS 36 Impairment & IAS 38 Intangibles</span><span style="color: #f59e0b; font-size: 12px;">⭐⭐⭐⭐</span></li>
+                  <li style="display: flex; justify-content: space-between; align-items: center; font-size: 14px;"><span style="font-weight: 600;">Ratio Analysis & Interpretation</span><span style="color: #f59e0b; font-size: 12px;">⭐⭐⭐⭐</span></li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="sh-grid-2" style="margin-bottom: 25px;">
+              <!-- Daily Study Plan -->
+              <div class="hub-card" style="border-top: 4px solid #3b82f6;">
+                <h3 style="margin-top: 0; display: flex; align-items: center; gap: 8px; color: var(--text-main);"><i data-lucide="clock" style="color: #3b82f6;"></i> Daily Study Plan (Consistency is Key)</h3>
+                <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 15px;">
+                  <div style="display: flex; gap: 12px; align-items: center;"><span style="background: rgba(59,130,246,0.15); color: #3b82f6; font-weight: 800; padding: 6px 10px; border-radius: 6px; width: 70px; text-align: center; font-size: 12px;">2 HOURS</span><div><strong style="display: block; font-size: 14px;">Learn & Understand New Concepts</strong><span style="font-size: 12px; color: var(--text-light);">Kaplan Study Text / Interactive notes</span></div></div>
+                  <div style="display: flex; gap: 12px; align-items: center;"><span style="background: rgba(16,185,129,0.15); color: #10b981; font-weight: 800; padding: 6px 10px; border-radius: 6px; width: 70px; text-align: center; font-size: 12px;">2 HOURS</span><div><strong style="display: block; font-size: 14px;">Practice Questions</strong><span style="font-size: 12px; color: var(--text-light);">Kit & Text topic-wise drills</span></div></div>
+                  <div style="display: flex; gap: 12px; align-items: center;"><span style="background: rgba(245,158,11,0.15); color: #f59e0b; font-weight: 800; padding: 6px 10px; border-radius: 6px; width: 70px; text-align: center; font-size: 12px;">1 HOUR</span><div><strong style="display: block; font-size: 14px;">Exam Kit / Past Questions</strong><span style="font-size: 12px; color: var(--text-light);">Timed exam simulations</span></div></div>
+                  <div style="display: flex; gap: 12px; align-items: center;"><span style="background: rgba(139,92,246,0.15); color: #8b5cf6; font-weight: 800; padding: 6px 10px; border-radius: 6px; width: 70px; text-align: center; font-size: 12px;">30 MIN</span><div><strong style="display: block; font-size: 14px;">Revision & Short Notes</strong><span style="font-size: 12px; color: var(--text-light);">Consolidate key concepts</span></div></div>
+                  <div style="display: flex; gap: 12px; align-items: center;"><span style="background: rgba(227,0,15,0.15); color: var(--acca-red); font-weight: 800; padding: 6px 10px; border-radius: 6px; width: 70px; text-align: center; font-size: 12px;">30 MIN</span><div><strong style="display: block; font-size: 14px;">Formula Sheet & IFRS Review</strong><span style="font-size: 12px; color: var(--text-light);">Memorize standard formats</span></div></div>
+                </div>
+              </div>
+
+              <!-- Last 30 Days Plan -->
+              <div class="hub-card" style="border-top: 4px solid #8b5cf6;">
+                <h3 style="margin-top: 0; display: flex; align-items: center; gap: 8px; color: var(--text-main);"><i data-lucide="calendar-check" style="color: #8b5cf6;"></i> Last 30 Days Plan (Plan Today, Score Tomorrow)</h3>
+                <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 15px;">
+                  <div style="border-left: 3px solid #8b5cf6; padding-left: 12px;"><strong>Week 1: Syllabus & Notes</strong><p style="margin: 3px 0 0 0; font-size: 13px; color: var(--text-light);">Complete entire syllabus and make summary revision notes.</p></div>
+                  <div style="border-left: 3px solid #3b82f6; padding-left: 12px;"><strong>Week 2: Exam Kit & Section B Focus</strong><p style="margin: 3px 0 0 0; font-size: 13px; color: var(--text-light);">Do Exam Kit thoroughly, focusing heavily on Section B case scenarios.</p></div>
+                  <div style="border-left: 3px solid #10b981; padding-left: 12px;"><strong>Week 3: Daily Section C Practice</strong><p style="margin: 3px 0 0 0; font-size: 13px; color: var(--text-light);">Daily Section C drafting (Financial Statements & Consolidation) under timed conditions.</p></div>
+                  <div style="border-left: 3px solid var(--acca-red); padding-left: 12px;"><strong>Week 4: Mock Tests & Weak Areas</strong><p style="margin: 3px 0 0 0; font-size: 13px; color: var(--text-light);">Attempt 3-5 Full Mock exams on ACCA CBE Practice Platform; revise weak IFRS.</p></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Exam Day Tips & Resources -->
+            <div class="sh-grid-2">
+              <div class="hub-card" style="border-left: 4px solid #10b981;">
+                <h4 style="margin: 0 0 10px 0; color: #10b981; display: flex; align-items: center; gap: 8px;"><i data-lucide="check-circle-2"></i> Exam Day Tips</h4>
+                <ul style="padding-left: 20px; font-size: 13px; color: var(--text-main); margin: 0; display: flex; flex-direction: column; gap: 8px;">
+                  <li><strong>Read requirements carefully</strong> before jumping to the case background.</li>
+                  <li><strong>Show all workings clearly</strong> in Section C (partial marks are lifesavers).</li>
+                  <li><strong>Manage time wisely:</strong> strictly abide by the 1.8 minutes per mark rule.</li>
+                  <li><strong>Use correct IFRS terminology:</strong> cite standard titles where relevant.</li>
+                  <li><strong>Never leave any question blank:</strong> attempt every OTQ!</li>
+                </ul>
+              </div>
+              <div class="hub-card" style="border-left: 4px solid #ef4444;">
+                <h4 style="margin: 0 0 10px 0; color: #ef4444; display: flex; align-items: center; gap: 8px;"><i data-lucide="alert-triangle"></i> Common Mistakes to Avoid</h4>
+                <ul style="padding-left: 20px; font-size: 13px; color: var(--text-main); margin: 0; display: flex; flex-direction: column; gap: 8px;">
+                  <li>Reading text without deep practical understanding of standards.</li>
+                  <li>Skipping presentation standards or theoretical Framework concepts.</li>
+                  <li>Ignoring Section C daily timed drafting practice until the final week.</li>
+                  <li>Not practicing under strict 3-hour CBE time constraints.</li>
+                  <li>Not analyzing and revising recurring calculation errors.</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <!-- TAB 2: Complete Syllabus & Pattern -->
+          <div id="chart-content-2" class="hidden">
+            <div class="hub-card" style="margin-bottom: 25px; border-top: 4px solid var(--acca-red);">
+              <h3 style="margin-top: 0; color: var(--text-main); display: flex; align-items: center; gap: 8px;"><i data-lucide="book-open" style="color: var(--acca-red);"></i> 1. Paper Overview & Exam Pattern</h3>
+              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-top: 15px; background: var(--panel-bg); padding: 15px; border-radius: 8px; border: 1px solid var(--border-color);">
+                <div><span style="font-size: 12px; color: var(--text-light);">Paper Code:</span><strong style="display: block; color: var(--text-main);">Financial Reporting (FR)</strong></div>
+                <div><span style="font-size: 12px; color: var(--text-light);">Level & Type:</span><strong style="display: block; color: var(--text-main);">Applied Skills (CBE)</strong></div>
+                <div><span style="font-size: 12px; color: var(--text-light);">Duration:</span><strong style="display: block; color: var(--text-main);">3 Hours + 10m reading</strong></div>
+                <div><span style="font-size: 12px; color: var(--text-light);">Pass Mark:</span><strong style="display: block; color: #10b981;">50% (100 Total Marks)</strong></div>
+              </div>
+            </div>
+
+            <h3 style="margin-bottom: 15px; color: var(--text-main); display: flex; align-items: center; gap: 8px;"><i data-lucide="layers" style="color: #3b82f6;"></i> 2. Complete Syllabus Modular Guide</h3>
+            <div class="sh-grid-2" style="margin-bottom: 30px;">
+              <div class="hub-card" style="border-left: 4px solid var(--acca-red);"><strong style="color: var(--text-main); font-size: 15px; display: block; margin-bottom: 8px;">A. Context & Purpose</strong><ul style="margin: 0 0 0 18px; font-size: 13px; color: var(--text-light); display: flex; flex-direction: column; gap: 5px;"><li>Regulatory & Conceptual Framework for financial reporting</li><li>Qualitative characteristics of useful financial information</li><li>Ethics and professional accounting principles</li></ul></div>
+              <div class="hub-card" style="border-left: 4px solid #3b82f6;"><strong style="color: var(--text-main); font-size: 15px; display: block; margin-bottom: 8px;">B. Preparing Statements</strong><ul style="margin: 0 0 0 18px; font-size: 13px; color: var(--text-light); display: flex; flex-direction: column; gap: 5px;"><li>Statement of Financial Position (SFP) drafting</li><li>Statement of Profit or Loss & Other Comprehensive Income</li><li>Statement of Changes in Equity & Statement of Cash Flows</li></ul></div>
+              <div class="hub-card" style="border-left: 4px solid #10b981;"><strong style="color: var(--text-main); font-size: 15px; display: block; margin-bottom: 8px;">C. Recognition & Measurement</strong><ul style="margin: 0 0 0 18px; font-size: 13px; color: var(--text-light); display: flex; flex-direction: column; gap: 5px;"><li>Tangible vs Intangible non-current asset valuation</li><li>Measurement bases, depreciation, amortization & impairment</li><li>Revenue recognition under contracts with customers</li></ul></div>
+              <div class="hub-card" style="border-left: 4px solid #f59e0b;"><strong style="color: var(--text-main); font-size: 15px; display: block; margin-bottom: 8px;">D. Additional Disclosures</strong><ul style="margin: 0 0 0 18px; font-size: 13px; color: var(--text-light); display: flex; flex-direction: column; gap: 5px;"><li>Financial Instruments accounting and impairment (IFRS 9)</li><li>Events after the Reporting Period (IAS 10) & Provisions (IAS 37)</li><li>Related party disclosures and reporting rules</li></ul></div>
+              <div class="hub-card" style="border-left: 4px solid #8b5cf6;"><strong style="color: var(--text-main); font-size: 15px; display: block; margin-bottom: 8px;">E. Accounting Techniques</strong><ul style="margin: 0 0 0 18px; font-size: 13px; color: var(--text-light); display: flex; flex-direction: column; gap: 5px;"><li>Accounting for Leases by Lessees and Lessors (IFRS 16)</li><li>Group Consolidation (IFRS 10, 3 & IAS 28 Associates)</li><li>Foreign currency transactions and monetary items (IAS 21)</li></ul></div>
+              <div class="hub-card" style="border-left: 4px solid #ec4899;"><strong style="color: var(--text-main); font-size: 15px; display: block; margin-bottom: 8px;">F. Analysis & Interpretation</strong><ul style="margin: 0 0 0 18px; font-size: 13px; color: var(--text-light); display: flex; flex-direction: column; gap: 5px;"><li>Profitability, liquidity, efficiency and gearing ratio calculation</li><li>Evaluating financial health and reporting limitations</li><li>Interpreting consolidated financial performance</li></ul></div>
+            </div>
+
+            <h3 style="margin-bottom: 15px; color: var(--text-main); display: flex; align-items: center; gap: 8px;"><i data-lucide="award" style="color: #f59e0b;"></i> 3. Key IFRS & IAS Standards to Master</h3>
+            <div class="hub-card exam-table-card" style="padding: 0; overflow: hidden; border-radius: 12px; border: 1px solid var(--border-color); border-top: 4px solid var(--acca-red); margin-bottom: 30px;">
+              <div style="overflow-x: auto;">
+                <table class="exam-table">
+                  <thead>
+                    <tr>
+                      <th style="width: 25%;">Standard</th>
+                      <th style="width: 55%;">Title & Core Focus Area</th>
+                      <th style="width: 20%; text-align: center;">Exam Importance</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr><td style="font-weight: 700; color: var(--acca-red);">IFRS 15</td><td>Revenue from Contracts with Customers (5-Step Recognition Model)</td><td style="text-align: center; color: #f59e0b;">⭐⭐⭐⭐⭐</td></tr>
+                    <tr><td style="font-weight: 700; color: var(--acca-red);">IFRS 16</td><td>Leases (Right-of-Use Asset measurement & Lease Liability amortization)</td><td style="text-align: center; color: #f59e0b;">⭐⭐⭐⭐⭐</td></tr>
+                    <tr><td style="font-weight: 700; color: #3b82f6;">IFRS 9</td><td>Financial Instruments (Amortized cost tables, EIR & impairment)</td><td style="text-align: center; color: #f59e0b;">⭐⭐⭐⭐</td></tr>
+                    <tr><td style="font-weight: 700; color: var(--acca-red);">IAS 1 & IAS 7</td><td>Presentation of FS & Statement of Cash Flows (Indirect Operating Cash)</td><td style="text-align: center; color: #f59e0b;">⭐⭐⭐⭐⭐</td></tr>
+                    <tr><td style="font-weight: 700; color: var(--acca-red);">IAS 16, 36, 38</td><td>Tangible PPE, Impairment of Assets & Intangible Assets (R&D / Goodwill)</td><td style="text-align: center; color: #f59e0b;">⭐⭐⭐⭐⭐</td></tr>
+                    <tr><td style="font-weight: 700; color: #10b981;">IAS 10 & IAS 37</td><td>Events After Reporting Date, Provisions & Contingent Liabilities</td><td style="text-align: center; color: #f59e0b;">⭐⭐⭐⭐</td></tr>
+                    <tr><td style="font-weight: 700; color: var(--acca-red);">IFRS 3, 10, IAS 28</td><td>Group Consolidation (Goodwill calculation, NCI & Equity Method)</td><td style="text-align: center; color: #f59e0b;">⭐⭐⭐⭐⭐</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <div class="sh-grid-2">
+              <div class="hub-card" style="border-left: 4px solid #3b82f6;">
+                <h4 style="margin: 0 0 10px 0; color: #3b82f6; display: flex; align-items: center; gap: 8px;"><i data-lucide="clock"></i> Time Management (180 Mins / 100 Marks)</h4>
+                <p style="font-size: 13px; color: var(--text-light); margin-bottom: 12px;">Golden Rule: <strong>Strict 1.8 minutes per mark</strong>. Never borrow time from subsequent sections!</p>
+                <ul style="font-size: 13px; margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 8px; color: var(--text-main);">
+                  <li><strong>Section A (30 Marks):</strong> Spend max 54 Minutes (15 OTQs × 2 marks)</li>
+                  <li><strong>Section B (30 Marks):</strong> Spend max 54 Minutes (3 Case Scenarios)</li>
+                  <li><strong>Section C (40 Marks):</strong> Spend max 72 Minutes (2 CRQs × 20 marks)</li>
+                </ul>
+              </div>
+              <div class="hub-card" style="border-left: 4px solid #10b981;">
+                <h4 style="margin: 0 0 10px 0; color: #10b981; display: flex; align-items: center; gap: 8px;"><i data-lucide="check-circle"></i> Final Checklist for 70+ Score</h4>
+                <ul style="font-size: 13px; margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 8px; color: var(--text-main);">
+                  <li>Syllabus practice text completed & key formats summarized</li>
+                  <li>All 19 core IFRS & IAS calculation formulas thoroughly memorized</li>
+                  <li>At least 5 Full Mocks completed under strict timed CBE setup</li>
+                  <li>Mastered pro-forma drafting for Consolidated SFP & P&L</li>
+                  <li>Confident, rested, and ready to ace the exam!</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <!-- TAB 3: Complete Formula Chart (19 Standards) -->
+          <div id="chart-content-3" class="hidden">
+            <p style="color: var(--text-light); margin-bottom: 25px;">Quick revision formula guide and pro-forma calculations for all 19 core Financial Reporting standards and topics.</p>
+            
+            <div class="sh-grid-2" style="margin-bottom: 25px;">
+              
+              <!-- 1. Accounting Equation & Framework -->
+              <div class="formula-card" style="border-top: 4px solid #3b82f6;">
+                <div class="formula-header"><i data-lucide="scale" style="color: #3b82f6;"></i> 1. Accounting Equation & Framework</div>
+                <div class="formula-list">
+                  <div class="formula-item">
+                    <span class="formula-label">Basic Accounting Equation:</span>
+                    <div class="formula-value">Assets = Liabilities + Equity</div>
+                  </div>
+                  <div class="formula-item">
+                    <span class="formula-label">Equity (Net Assets):</span>
+                    <div class="formula-value">Equity = Total Assets - Total Liabilities</div>
+                  </div>
+                  <div class="formula-item">
+                    <span class="formula-label">Closing Net Assets:</span>
+                    <div class="formula-value">Opening Equity + Profit - Drawings + New Capital</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 2. Working Capital & Liquidity -->
+              <div class="formula-card" style="border-top: 4px solid #10b981;">
+                <div class="formula-header"><i data-lucide="droplet" style="color: #10b981;"></i> 2 & 3. Working Capital & Liquidity</div>
+                <div class="formula-list">
+                  <div class="formula-item">
+                    <span class="formula-label">Net Working Capital:</span>
+                    <div class="formula-value">Current Assets - Current Liabilities</div>
+                  </div>
+                  <div class="formula-item">
+                    <span class="formula-label">Current Ratio:</span>
+                    <div class="formula-value">Current Assets / Current Liabilities (X : 1)</div>
+                  </div>
+                  <div class="formula-item">
+                    <span class="formula-label">Quick (Acid Test) Ratio:</span>
+                    <div class="formula-value">(Current Assets - Inventories) / Current Liabilities</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 4. Inventory Valuation (IAS 2) -->
+              <div class="formula-card" style="border-top: 4px solid var(--acca-red);">
+                <div class="formula-header"><i data-lucide="package" style="color: var(--acca-red);"></i> 4. Inventory Valuation (IAS 2)</div>
+                <div class="formula-list">
+                  <div class="formula-item" style="border-left-color: var(--acca-red);">
+                    <span class="formula-label">Core Valuation Rule:</span>
+                    <div class="formula-value formula-highlight">Lower of Cost and Net Realisable Value (NRV)</div>
+                  </div>
+                  <div class="formula-item">
+                    <span class="formula-label">Net Realisable Value (NRV):</span>
+                    <div class="formula-value">Est. Selling Price - Completion Costs - Selling Costs</div>
+                  </div>
+                  <div class="formula-item">
+                    <span class="formula-label">Weighted Average Cost (AVCO):</span>
+                    <div class="formula-value">Total Cost of Goods Avail. / Total Units Avail.</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 5. Property, Plant & Equipment (IAS 16) -->
+              <div class="formula-card" style="border-top: 4px solid #8b5cf6;">
+                <div class="formula-header"><i data-lucide="building" style="color: #8b5cf6;"></i> 5. PP&E & Revaluation (IAS 16)</div>
+                <div class="formula-list">
+                  <div class="formula-item">
+                    <span class="formula-label">Straight-Line Depreciation:</span>
+                    <div class="formula-value">(Cost - Residual Value) / Useful Life</div>
+                  </div>
+                  <div class="formula-item">
+                    <span class="formula-label">Carrying Amount:</span>
+                    <div class="formula-value">Cost - Accumulated Depr. - Impairment Losses</div>
+                  </div>
+                  <div class="formula-item">
+                    <span class="formula-label">Revaluation Surplus (OCI / Equity):</span>
+                    <div class="formula-value">Fair Value (Revalued Amount) - Carrying Amount</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 6 & 7. Intangibles & Impairment -->
+              <div class="formula-card" style="border-top: 4px solid #ec4899;">
+                <div class="formula-header"><i data-lucide="trending-down" style="color: #ec4899;"></i> 6 & 7. Intangibles & Impairment (IAS 38/36)</div>
+                <div class="formula-list">
+                  <div class="formula-item" style="border-left-color: #ec4899;">
+                    <span class="formula-label">Recoverable Amount (IAS 36):</span>
+                    <div class="formula-value" style="font-weight: 700; color: #ec4899;">Higher of (FV less Disposal Costs) & (Value in Use)</div>
+                  </div>
+                  <div class="formula-item">
+                    <span class="formula-label">Impairment Loss Calculation:</span>
+                    <div class="formula-value">Carrying Amount - Recoverable Amount</div>
+                  </div>
+                  <div class="formula-item">
+                    <span class="formula-label">Amortisation (Finite Life IAS 38):</span>
+                    <div class="formula-value">(Cost - Residual Value) / Useful Life</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 8. Financial Instruments (IFRS 9) -->
+              <div class="formula-card" style="border-top: 4px solid #06b6d4;">
+                <div class="formula-header"><i data-lucide="credit-card" style="color: #06b6d4;"></i> 8. Financial Instruments (IFRS 9)</div>
+                <div class="formula-list">
+                  <div class="formula-item">
+                    <span class="formula-label">Amortised Cost Carrying Balance:</span>
+                    <div class="formula-value">Opening Balance + Effective Interest - Cash Coupon</div>
+                  </div>
+                  <div class="formula-item">
+                    <span class="formula-label">Finance Cost (P&L Expense/Income):</span>
+                    <div class="formula-value">Opening Carrying Amount × Effective Interest Rate</div>
+                  </div>
+                  <div class="formula-item">
+                    <span class="formula-label">Cash Coupon Paid / Received:</span>
+                    <div class="formula-value">Nominal Principal Amount × Nominal (Coupon) Rate %</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 9. Leases (IFRS 16) -->
+              <div class="formula-card" style="border-top: 4px solid #10b981;">
+                <div class="formula-header"><i data-lucide="file-text" style="color: #10b981;"></i> 9. Leases & ROU Asset (IFRS 16)</div>
+                <div class="formula-list">
+                  <div class="formula-item">
+                    <span class="formula-label">Initial ROU Asset Measurement:</span>
+                    <div class="formula-value">Initial Liability + Direct Costs + Prepayments - Incentives</div>
+                  </div>
+                  <div class="formula-item">
+                    <span class="formula-label">Subsequent Lease Liability:</span>
+                    <div class="formula-value">Opening Liability + (Opening × Rate) - Lease Payment</div>
+                  </div>
+                  <div class="formula-item">
+                    <span class="formula-label">Lease Liability Initial Value:</span>
+                    <div class="formula-value">Present Value (PV) of unpaid future lease payments</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 10. Revenue Recognition (IFRS 15) -->
+              <div class="formula-card" style="border-top: 4px solid #f97316;">
+                <div class="formula-header"><i data-lucide="shopping-cart" style="color: #f97316;"></i> 10. Revenue Recognition (IFRS 15)</div>
+                <div class="formula-list">
+                  <div class="formula-item">
+                    <span class="formula-label">5-Step Recognition Model:</span>
+                    <div class="formula-value">1. Contract | 2. Obligations | 3. Price | 4. Allocate | 5. Recognise</div>
+                  </div>
+                  <div class="formula-item">
+                    <span class="formula-label">Transaction Price Allocation:</span>
+                    <div class="formula-value">(Standalone Price / Total Standalone Prices) × Total Tx Price</div>
+                  </div>
+                  <div class="formula-item">
+                    <span class="formula-label">Recognition Timing Rule:</span>
+                    <div class="formula-value">Recognise as or when each obligation is satisfied</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 11 & 12. Foreign Currency & Provisions -->
+              <div class="formula-card" style="border-top: 4px solid #6366f1;">
+                <div class="formula-header"><i data-lucide="globe" style="color: #6366f1;"></i> 11 & 12. Foreign Currency & Provisions</div>
+                <div class="formula-list">
+                  <div class="formula-item">
+                    <span class="formula-label">Monetary Items (Receivables/Payables):</span>
+                    <div class="formula-value">Retranslate at Closing Rate (Exch. gains/losses to P&L)</div>
+                  </div>
+                  <div class="formula-item">
+                    <span class="formula-label">Non-Monetary Items (PPE/Inventory):</span>
+                    <div class="formula-value">Do NOT retranslate at year-end (keep at historic spot rate)</div>
+                  </div>
+                  <div class="formula-item">
+                    <span class="formula-label">Provision Recognition Rule (IAS 37):</span>
+                    <div class="formula-value">Present Obligation + Probable Outflow (>50%) + Reliable Estimate</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 13 & 14. Taxation & EPS -->
+              <div class="formula-card" style="border-top: 4px solid #14b8a6;">
+                <div class="formula-header"><i data-lucide="pie-chart" style="color: #14b8a6;"></i> 13 & 14. Taxation (IAS 12) & EPS (IAS 33)</div>
+                <div class="formula-list">
+                  <div class="formula-item">
+                    <span class="formula-label">Deferred Tax Asset / Liability:</span>
+                    <div class="formula-value">Temporary Difference (Carrying Amount - Tax Base) × Tax Rate %</div>
+                  </div>
+                  <div class="formula-item" style="border-left-color: #14b8a6;">
+                    <span class="formula-label">Basic EPS (Earnings Per Share):</span>
+                    <div class="formula-value" style="font-weight: 700; color: #14b8a6;">Profit Attrib. to Ordinary Shares / Weighted Avg Shares</div>
+                  </div>
+                  <div class="formula-item">
+                    <span class="formula-label">Total P&L Tax Expense:</span>
+                    <div class="formula-value">Current Tax Payable ± Movement in Deferred Tax Balance</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 15 & 16. Cash Flow & Consolidation -->
+              <div class="formula-card" style="border-top: 4px solid var(--acca-red);">
+                <div class="formula-header"><i data-lucide="repeat" style="color: var(--acca-red);"></i> 15 & 16. Cash Flow & Consolidation</div>
+                <div class="formula-list">
+                  <div class="formula-item" style="border-left-color: var(--acca-red);">
+                    <span class="formula-label">Goodwill on Acquisition (IFRS 3):</span>
+                    <div class="formula-value formula-highlight">Consideration + NCI at Acquisition - Fair Value Net Identifiable Assets</div>
+                  </div>
+                  <div class="formula-item">
+                    <span class="formula-label">NCI at Reporting Date (IFRS 10):</span>
+                    <div class="formula-value">NCI at Acquisition + NCI Share of Post-Acquisition Reserves</div>
+                  </div>
+                  <div class="formula-item">
+                    <span class="formula-label">Operating Cash Flow (IAS 7):</span>
+                    <div class="formula-value">PBIT + Depr/Amort ± Working Capital Movements - Tax & Interest Paid</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 17-19. Ratio Analysis & Key Abbreviations -->
+              <div class="formula-card" style="border-top: 4px solid #8b5cf6; grid-column: 1 / -1;">
+                <div class="formula-header"><i data-lucide="bar-chart-2" style="color: #8b5cf6;"></i> 17 - 19. Ratio Analysis (Performance Evaluation) & Key Abbreviations</div>
+                
+                <div class="sh-grid-2" style="gap: 20px; margin-bottom: 15px;">
+                  <div class="formula-list">
+                    <div class="formula-item">
+                      <span class="formula-label">ROCE (Return on Capital Employed):</span>
+                      <div class="formula-value">(PBIT / Capital Employed) × 100%</div>
+                    </div>
+                    <div class="formula-item">
+                      <span class="formula-label">Asset Turnover:</span>
+                      <div class="formula-value">Revenue / Capital Employed (Expressed as X times)</div>
+                    </div>
+                    <div class="formula-item">
+                      <span class="formula-label">Gross Profit Margin:</span>
+                      <div class="formula-value">(Gross Profit / Revenue) × 100%</div>
+                    </div>
+                    <div class="formula-item">
+                      <span class="formula-label">Operating Profit Margin (PBIT Margin):</span>
+                      <div class="formula-value">(PBIT / Revenue) × 100%</div>
+                    </div>
+                    <div class="formula-item">
+                      <span class="formula-label">Gearing Ratio (Debt / Equity):</span>
+                      <div class="formula-value">(Non-Current Liabilities / Total Equity) × 100%</div>
+                    </div>
+                  </div>
+
+                  <div class="formula-list">
+                    <div class="formula-item">
+                      <span class="formula-label">Interest Coverage Ratio:</span>
+                      <div class="formula-value">PBIT / Finance Costs (Expressed as X times)</div>
+                    </div>
+                    <div class="formula-item">
+                      <span class="formula-label">Inventory Turnover & Days:</span>
+                      <div class="formula-value">(Average Inventory / Cost of Sales) × 365 days</div>
+                    </div>
+                    <div class="formula-item">
+                      <span class="formula-label">Receivables Collection Days:</span>
+                      <div class="formula-value">(Trade Receivables / Revenue) × 365 days</div>
+                    </div>
+                    <div class="formula-item">
+                      <span class="formula-label">Payables Payment Days:</span>
+                      <div class="formula-value">(Trade Payables / Cost of Sales or Purchases) × 365 days</div>
+                    </div>
+                    <div class="formula-item">
+                      <span class="formula-label">Capital Employed Definition:</span>
+                      <div class="formula-value">Total Equity + Non-Current Liabilities (or Total Assets - Current Liabilities)</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div style="font-size: 12px; background: rgba(139, 92, 246, 0.08); padding: 12px 15px; border-radius: 8px; color: var(--text-main); line-height: 1.6; border: 1px dashed rgba(139, 92, 246, 0.3);">
+                  <strong>Key FR Abbreviations:</strong> ROU = Right-of-Use Asset | PV = Present Value | EIR = Effective Interest Rate | NCI = Non-Controlling Interest | FV = Fair Value | NRV = Net Realisable Value | EPS = Earnings Per Share | PBIT = Profit Before Interest & Tax | ROCE = Return on Capital Employed | OCI = Other Comprehensive Income
+                </div>
+              </div>
+
             </div>
           </div>
         </div>

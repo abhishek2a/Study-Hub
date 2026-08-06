@@ -232,7 +232,6 @@ document.addEventListener('DOMContentLoaded', async () => { try {
         // We can hide all if not implemented, or just show all
         show = true;
       }
-      
       item.style.display = show ? 'block' : 'none';
     });
   };
@@ -240,48 +239,37 @@ document.addEventListener('DOMContentLoaded', async () => { try {
   // Toggle My Account
   window.toggleMyAccount = function() {
     const profileTab = document.getElementById('tab-profile');
-    const contentWrapper = document.getElementById('sh-content-wrapper');
-    const qbTab = document.getElementById('tab-qb');
-    
     if (!profileTab) return;
-    
     const isProfileVisible = profileTab.style.display === 'block';
     
-    // Clear sidebar active states if we are showing profile
     if (!isProfileVisible) {
-        document.querySelectorAll('.sh-nav li').forEach(li => li.classList.remove('active'));
-    } else {
-        const navCh = document.getElementById('nav-chapters');
-        if(navCh) navCh.classList.add('active');
-    }
-    
-    if (isProfileVisible) {
-      profileTab.classList.add('hidden');
-      profileTab.style.display = 'none';
-      if (qbTab) { qbTab.classList.add('hidden'); qbTab.style.display = 'none'; }
-      const trackerTab = document.getElementById('tab-tracker');
-      if (trackerTab) { trackerTab.classList.add('hidden'); trackerTab.style.display = 'none'; }
-      if (contentWrapper) {
-        contentWrapper.classList.remove('hidden');
-        contentWrapper.style.display = 'block';
+      document.querySelectorAll('.sh-nav li').forEach(li => li.classList.remove('active'));
+      if (typeof hideAllStudyHubTabs === 'function') {
+        hideAllStudyHubTabs();
+      } else {
+        ['sh-content-wrapper', 'tab-qb', 'tab-planner', 'tab-examchart', 'tab-tracker'].forEach(id => {
+          const el = document.getElementById(id);
+          if (el) { el.classList.add('hidden'); el.style.display = 'none'; }
+        });
       }
-    } else {
-      if (contentWrapper) {
-        contentWrapper.classList.add('hidden');
-        contentWrapper.style.display = 'none';
-      }
-      if (qbTab) { qbTab.classList.add('hidden'); qbTab.style.display = 'none'; }
-      const trackerTab = document.getElementById('tab-tracker');
-      if (trackerTab) { trackerTab.classList.add('hidden'); trackerTab.style.display = 'none'; }
-      
       profileTab.classList.remove('hidden');
       profileTab.style.display = 'block';
       profileTab.style.opacity = '1';
       profileTab.style.visibility = 'visible';
-        
-        loadSessionHistory();
+      loadSessionHistory();
+    } else {
+      const navCh = document.getElementById('nav-chapters');
+      if(navCh) navCh.classList.add('active');
+      if (typeof window.showStudyChapters === 'function') {
+        window.showStudyChapters();
+      } else {
+        profileTab.classList.add('hidden');
+        profileTab.style.display = 'none';
+        const cw = document.getElementById('sh-content-wrapper');
+        if (cw) { cw.classList.remove('hidden'); cw.style.display = 'block'; }
       }
-    };
+    }
+  };
 
   window.toggleMyAccountFromML = function() {
       if (!window.currentCourse) {
@@ -301,9 +289,11 @@ document.addEventListener('DOMContentLoaded', async () => { try {
          contentWrapper.classList.add('hidden');
          contentWrapper.style.display = 'none';
       }
-      const trackerTab = document.getElementById('tab-tracker');
+       const trackerTab = document.getElementById('tab-tracker');
+       const examTab = document.getElementById('tab-examchart');
        if (trackerTab) { trackerTab.classList.add('hidden'); trackerTab.style.display = 'none'; }
        if (plannerTab) { plannerTab.classList.add('hidden'); plannerTab.style.display = 'none'; }
+       if (examTab) { examTab.classList.add('hidden'); examTab.style.display = 'none'; }
        if (qbTab) {
          qbTab.classList.add('hidden');
          qbTab.style.display = 'none';
@@ -317,41 +307,31 @@ document.addEventListener('DOMContentLoaded', async () => { try {
       }
   };
 
+  function hideAllStudyHubTabs() {
+    ['sh-content-wrapper', 'tab-qb', 'tab-planner', 'tab-examchart', 'tab-tracker', 'tab-profile'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) { el.classList.add('hidden'); el.style.display = 'none'; }
+    });
+  }
+
   window.showStudyChapters = function() {
     document.querySelectorAll('.sh-nav li').forEach(li => li.classList.remove('active'));
     const navCh = document.getElementById('nav-chapters');
     if(navCh) navCh.classList.add('active');
-    
-    const profileTab = document.getElementById('tab-profile');
-    const contentWrapper = document.getElementById('sh-content-wrapper');
-    const qbTab = document.getElementById('tab-qb');
-    const trackerTab = document.getElementById('tab-tracker');
-    const plannerTab = document.getElementById('tab-planner');
-    
-    if (profileTab) { profileTab.classList.add('hidden'); profileTab.style.display = 'none'; }
-    if (qbTab) { qbTab.classList.add('hidden'); qbTab.style.display = 'none'; }
-    if (trackerTab) { trackerTab.classList.add('hidden'); trackerTab.style.display = 'none'; }
-    if (plannerTab) { plannerTab.classList.add('hidden'); plannerTab.style.display = 'none'; }
-    if (contentWrapper) { contentWrapper.classList.remove('hidden'); contentWrapper.style.display = 'block'; }
+    hideAllStudyHubTabs();
+    const el = document.getElementById('sh-content-wrapper');
+    if (el) { el.classList.remove('hidden'); el.style.display = 'block'; }
+    const frBanner = document.getElementById('fr-exam-banner');
+    if (frBanner) frBanner.style.display = (typeof currentCourse !== 'undefined' && currentCourse === 'cseb') ? 'none' : 'flex';
   };
 
   window.showQuestionBanks = function() {
     document.querySelectorAll('.sh-nav li').forEach(li => li.classList.remove('active'));
     const navQb = document.getElementById('nav-qb');
     if(navQb) navQb.classList.add('active');
-    
-    const profileTab = document.getElementById('tab-profile');
-    const contentWrapper = document.getElementById('sh-content-wrapper');
-    const qbTab = document.getElementById('tab-qb');
-    const trackerTab = document.getElementById('tab-tracker');
-    const plannerTab = document.getElementById('tab-planner');
-    
-    if (profileTab) { profileTab.classList.add('hidden'); profileTab.style.display = 'none'; }
-    if (contentWrapper) { contentWrapper.classList.add('hidden'); contentWrapper.style.display = 'none'; }
-    if (trackerTab) { trackerTab.classList.add('hidden'); trackerTab.style.display = 'none'; }
-    if (plannerTab) { plannerTab.classList.add('hidden'); plannerTab.style.display = 'none'; }
-    if (qbTab) { qbTab.classList.remove('hidden'); qbTab.style.display = 'block'; }
-    
+    hideAllStudyHubTabs();
+    const el = document.getElementById('tab-qb');
+    if (el) { el.classList.remove('hidden'); el.style.display = 'block'; }
     renderQuestionBanks();
   };
 
@@ -359,20 +339,63 @@ document.addEventListener('DOMContentLoaded', async () => { try {
     document.querySelectorAll('.sh-nav li').forEach(li => li.classList.remove('active'));
     const navPl = document.getElementById('nav-planner');
     if(navPl) navPl.classList.add('active');
-    
-    const profileTab = document.getElementById('tab-profile');
-    const contentWrapper = document.getElementById('sh-content-wrapper');
-    const qbTab = document.getElementById('tab-qb');
-    const trackerTab = document.getElementById('tab-tracker');
-    const plannerTab = document.getElementById('tab-planner');
-    
-    if (profileTab) { profileTab.classList.add('hidden'); profileTab.style.display = 'none'; }
-    if (contentWrapper) { contentWrapper.classList.add('hidden'); contentWrapper.style.display = 'none'; }
-    if (qbTab) { qbTab.classList.add('hidden'); qbTab.style.display = 'none'; }
-    if (trackerTab) { trackerTab.classList.add('hidden'); trackerTab.style.display = 'none'; }
-    if (plannerTab) { plannerTab.classList.remove('hidden'); plannerTab.style.display = 'block'; }
+    hideAllStudyHubTabs();
+    const el = document.getElementById('tab-planner');
+    if (el) { el.classList.remove('hidden'); el.style.display = 'block'; }
     if (window.lucide) window.lucide.createIcons();
   };
+
+  window.showExamChart = function() {
+    document.querySelectorAll('.sh-nav li').forEach(li => li.classList.remove('active'));
+    const navEx = document.getElementById('nav-examchart');
+    if(navEx) navEx.classList.add('active');
+    hideAllStudyHubTabs();
+    const el = document.getElementById('tab-examchart');
+    if (el) { el.classList.remove('hidden'); el.style.display = 'block'; }
+    if (window.lucide) window.lucide.createIcons();
+    updateExamCountdown();
+  };
+
+  window.switchExamChartTab = function(tabNumber) {
+    [1, 2, 3].forEach(num => {
+      const el = document.getElementById(`chart-content-${num}`);
+      const btn = document.getElementById(`chart-tab-btn-${num}`);
+      if (el) {
+        if (num === tabNumber) {
+          el.classList.remove('hidden');
+          el.style.display = 'block';
+        } else {
+          el.classList.add('hidden');
+          el.style.display = 'none';
+        }
+      }
+      if (btn) {
+        if (num === tabNumber) {
+          btn.style.background = 'var(--acca-red)';
+          btn.style.color = 'white';
+          btn.style.border = 'none';
+        } else {
+          btn.style.background = 'var(--panel-bg)';
+          btn.style.color = 'var(--text-main)';
+          btn.style.border = '1px solid var(--border-color)';
+        }
+      }
+    });
+    if (window.lucide) window.lucide.createIcons();
+  };
+
+  function updateExamCountdown() {
+    const target = new Date('2026-12-10T09:00:00');
+    const now = new Date();
+    const diffDays = Math.ceil((target - now) / (1000 * 60 * 60 * 24));
+    const text = diffDays > 0 ? `${diffDays} Days Remaining` : 'Exam Day / Completed';
+    const badge = document.getElementById('chart-countdown-text');
+    if (badge) badge.textContent = text;
+    document.querySelectorAll('.exam-countdown-badge').forEach(b => {
+      b.textContent = `â³ ${text} to Dec 10 Exam`;
+    });
+  }
+  setTimeout(updateExamCountdown, 1000);
 
   window.switchPlannerDay = function(dayNumber) {
     const titleEl = document.getElementById('planner-header-title');
@@ -740,21 +763,40 @@ document.addEventListener('DOMContentLoaded', async () => { try {
       if (topSel) topSel.value = courseValue;
       if (mainSel) mainSel.value = courseValue;
       
-      const titleStr = courseValue === 'acca' ? 'For Exams from September 2026 to June 2027 – (FR) Financial Reporting' : 'Kerala Co-operative Service Examination Board (CSEB)';
+      const titleStr = courseValue === 'acca' ? 'For Exams from September 2026 to June 2027 â€“ (FR) Financial Reporting' : 'Kerala Co-operative Service Examination Board (CSEB)';
       const headingDisplay = document.getElementById('course-heading-display');
       const titleDisplay = document.getElementById('course-title-display');
       
       if (headingDisplay) headingDisplay.textContent = titleStr;
       if (titleDisplay) titleDisplay.textContent = titleStr;
+      window.currentCourse = courseValue;
       
-      // Hide Study Tracker for CSEB
+      // Hide ACCA FR-specific navigation items (Tracker, Exam Chart Strategy, Planner) & discovery banner for CSEB
       const navTracker = document.getElementById('nav-tracker');
-      if (navTracker) {
-        if (courseValue === 'cseb') {
-          navTracker.style.display = 'none';
-        } else {
-          navTracker.style.display = 'flex';
+      const navExamChart = document.getElementById('nav-examchart');
+      const navPlanner = document.getElementById('nav-planner');
+      const frExamBanner = document.getElementById('fr-exam-banner');
+
+      if (courseValue === 'cseb') {
+        if (navTracker) navTracker.style.display = 'none';
+        if (navExamChart) navExamChart.style.display = 'none';
+        if (navPlanner) navPlanner.style.display = 'none';
+        if (frExamBanner) frExamBanner.style.display = 'none';
+
+        // If currently viewing an ACCA-specific tab, automatically switch to Chapters view
+        const tabExamChart = document.getElementById('tab-examchart');
+        const tabTracker = document.getElementById('tab-tracker');
+        const tabPlanner = document.getElementById('tab-planner');
+        if ((tabExamChart && !tabExamChart.classList.contains('hidden')) ||
+            (tabTracker && !tabTracker.classList.contains('hidden')) ||
+            (tabPlanner && !tabPlanner.classList.contains('hidden'))) {
+          if (typeof window.showStudyChapters === 'function') window.showStudyChapters();
         }
+      } else {
+        if (navTracker) navTracker.style.display = 'flex';
+        if (navExamChart) navExamChart.style.display = 'flex';
+        if (navPlanner) navPlanner.style.display = 'flex';
+        if (frExamBanner) frExamBanner.style.display = 'flex';
       }
     }
     renderChapters();
@@ -1583,6 +1625,8 @@ document.addEventListener('DOMContentLoaded', async () => { try {
         if (qbTab) { qbTab.classList.add('hidden'); qbTab.style.display = 'none'; }
         if (profileTab) { profileTab.classList.add('hidden'); profileTab.style.display = 'none'; }
         if (plannerTab) { plannerTab.classList.add('hidden'); plannerTab.style.display = 'none'; }
+        const examTab = document.getElementById('tab-examchart');
+        if (examTab) { examTab.classList.add('hidden'); examTab.style.display = 'none'; }
         
         trackerTab.classList.remove('hidden');
         trackerTab.style.display = 'block';
@@ -1612,6 +1656,7 @@ document.addEventListener('DOMContentLoaded', async () => { try {
       alert('Toggle Tracker Error: ' + err.message);
     }
   };
+
   window.submitTracker = async function(e) {
     e.preventDefault();
     if (!auth.currentUser) return;

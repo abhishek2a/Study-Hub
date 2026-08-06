@@ -1341,5 +1341,106 @@ body {
     gap: 15px !important;
 }
 
+/* FR Exam Chart & Formula Styling */
+.exam-table-card {
+  overflow-x: auto;
+  margin-bottom: 25px;
+}
+.exam-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 14px;
+}
+.exam-table th {
+  padding: 12px 16px;
+  color: var(--text-light);
+  font-weight: 600;
+  background: var(--bg-color);
+  border-bottom: 2px solid var(--border-color);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.exam-table td {
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border-color);
+  color: var(--text-main);
+  vertical-align: middle;
+  line-height: 1.5;
+}
+.exam-table tr:hover {
+  background: rgba(0, 0, 0, 0.015);
+}
+.formula-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  border-radius: 12px;
+  background: var(--panel-bg);
+  padding: 18px;
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-card);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.formula-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-card-hover);
+}
+.formula-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-main);
+  margin-bottom: 14px;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 10px;
+}
+.formula-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  font-size: 13px;
+  line-height: 1.5;
+}
+.formula-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 10px 12px;
+  background: var(--bg-color);
+  border-radius: 6px;
+  border-left: 3px solid var(--acca-red);
+}
+.formula-label {
+  font-weight: 600;
+  color: var(--text-main);
+  font-size: 13px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.formula-value {
+  color: var(--text-main);
+  font-family: 'Consolas', 'Courier New', monospace;
+  font-size: 13px;
+  word-break: break-word;
+  background: rgba(0, 0, 0, 0.03);
+  padding: 6px 8px;
+  border-radius: 4px;
+}
+.formula-highlight {
+  color: var(--acca-red);
+  font-weight: 700;
+}
+@media (max-width: 768px) {
+  .exam-table th, .exam-table td {
+    padding: 10px 12px;
+    font-size: 13px;
+  }
+}
+
 
 
