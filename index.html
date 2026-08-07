@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <script src="plannerData.js?v=2"></script>
-<script src="app.js?v=57"></script>
+<script src="app.js?v=58"></script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
   <title>Study Hub Portal</title>
@@ -246,12 +246,12 @@
           
           <div style="position: relative;" id="course-dropdown-container">
             <div style="display: flex; align-items: center; gap: 8px; cursor: pointer; color: var(--text-main); font-size: 14px; font-weight: 500; padding: 6px 10px; border-radius: 6px; transition: background 0.2s;" onmouseover="this.style.background='rgba(0,0,0,0.04)'" onmouseout="this.style.background='transparent'" onclick="document.getElementById('course-dropdown-menu').classList.toggle('hidden')">
-              <span id="course-title-display">For Exams from September 2026 to June 2027 – (FR) Financial Reporting</span>
+              <span id="course-title-display">For Exams from September 2026 to June 2027 - (FR) Financial Reporting</span>
               <i data-lucide="chevron-down" style="width: 16px; height: 16px; color: var(--text-main);"></i>
             </div>
             <div id="course-dropdown-menu" class="hidden" style="position: absolute; top: calc(100% + 5px); left: 0; background: #ffffff; border: 1px solid var(--border-color); border-radius: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); z-index: 50; width: max-content; min-width: 250px; max-width: 90vw; overflow: hidden; display: flex; flex-direction: column;">
               <div onclick="if(window.switchCourse) window.switchCourse('acca'); document.getElementById('course-dropdown-menu').classList.add('hidden')" style="padding: 14px 18px; cursor: pointer; border-bottom: 1px solid var(--border-color); color: var(--text-main); font-weight: 500; display: flex; align-items: center; gap: 10px; transition: background 0.2s, color 0.2s;" onmouseover="this.style.background='rgba(227, 0, 15, 0.05)'; this.style.color='#E3000F'" onmouseout="this.style.background='transparent'; this.style.color='var(--text-main)'">
-                <i data-lucide="book" style="width: 18px; height: 18px;"></i> For Exams from September 2026 to June 2027 – (FR) Financial Reporting
+                <i data-lucide="book" style="width: 18px; height: 18px;"></i> For Exams from September 2026 to June 2027 - (FR) Financial Reporting
               </div>
               <div id="cseb-dropdown-btn" onclick="if(window.switchCourse) window.switchCourse('cseb'); document.getElementById('course-dropdown-menu').classList.add('hidden')" style="padding: 14px 18px; cursor: pointer; color: var(--text-main); font-weight: 500; display: flex; align-items: center; gap: 10px; transition: background 0.2s, color 0.2s;" onmouseover="this.style.background='rgba(227, 0, 15, 0.05)'; this.style.color='#E3000F'" onmouseout="this.style.background='transparent'; this.style.color='var(--text-main)'">
                 <i data-lucide="book-open" style="width: 18px; height: 18px;"></i> Kerala Co-operative Service Examination Board (CSEB)

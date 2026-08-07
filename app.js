@@ -856,7 +856,7 @@ document.addEventListener('DOMContentLoaded', async () => { try {
       if (topSel) topSel.value = courseValue;
       if (mainSel) mainSel.value = courseValue;
       
-      const titleStr = courseValue === 'acca' ? 'For Exams from September 2026 to June 2027 â€“ (FR) Financial Reporting' : 'Kerala Co-operative Service Examination Board (CSEB)';
+      const titleStr = courseValue === 'acca' ? 'For Exams from September 2026 to June 2027 - (FR) Financial Reporting' : 'Kerala Co-operative Service Examination Board (CSEB)';
       const headingDisplay = document.getElementById('course-heading-display');
       const titleDisplay = document.getElementById('course-title-display');
       
