@@ -342,6 +342,13 @@ document.addEventListener('DOMContentLoaded', async () => { try {
     hideAllStudyHubTabs();
     const el = document.getElementById('tab-planner');
     if (el) { el.classList.remove('hidden'); el.style.display = 'block'; }
+    if (window.renderPlannerDays) {
+      const container = document.getElementById('planner-pills-container');
+      if (container && container.children.length === 0) {
+        window.renderPlannerDays();
+        if (window.switchPlannerDay) window.switchPlannerDay(1);
+      }
+    }
     if (window.lucide) window.lucide.createIcons();
   };
 
@@ -397,26 +404,34 @@ document.addEventListener('DOMContentLoaded', async () => { try {
   }
   setTimeout(updateExamCountdown, 1000);
 
+  window.renderPlannerDays = function() {
+    const container = document.getElementById('planner-pills-container');
+    if (!container || !window.fr30DayPlan) return;
+    container.innerHTML = '';
+    window.fr30DayPlan.forEach(dayData => {
+      const btn = document.createElement('button');
+      btn.id = `planner-btn-${dayData.day}`;
+      btn.className = 'sh-btn';
+      btn.textContent = `Day ${dayData.day} Plan`;
+      btn.style.background = 'var(--panel-bg)';
+      btn.style.color = 'var(--text-main)';
+      btn.style.border = '1px solid var(--border-color)';
+      btn.style.fontWeight = '600';
+      btn.onclick = () => window.switchPlannerDay(dayData.day);
+      container.appendChild(btn);
+    });
+  };
+
   window.switchPlannerDay = function(dayNumber) {
+    if (!window.fr30DayPlan) return;
     const titleEl = document.getElementById('planner-header-title');
     if (titleEl) titleEl.textContent = `Day ${dayNumber} Plan`;
 
-    [1, 2].forEach(num => {
-      const contentEl = document.getElementById(`planner-content-${num}`);
-      const btnEl = document.getElementById(`planner-btn-${num}`);
-      
-      if (contentEl) {
-        if (num === dayNumber) {
-          contentEl.classList.remove('hidden');
-          contentEl.style.display = 'block';
-        } else {
-          contentEl.classList.add('hidden');
-          contentEl.style.display = 'none';
-        }
-      }
-      
+    // Update buttons
+    window.fr30DayPlan.forEach(dayData => {
+      const btnEl = document.getElementById(`planner-btn-${dayData.day}`);
       if (btnEl) {
-        if (num === dayNumber) {
+        if (dayData.day === dayNumber) {
           btnEl.style.background = 'var(--acca-red)';
           btnEl.style.color = 'white';
           btnEl.style.border = '1px solid var(--acca-red)';
@@ -428,6 +443,84 @@ document.addEventListener('DOMContentLoaded', async () => { try {
       }
     });
 
+    // Render Content
+    const contentContainer = document.getElementById('planner-content-container');
+    if (!contentContainer) return;
+    
+    const dayData = window.fr30DayPlan.find(d => d.day === dayNumber);
+    if (!dayData) return;
+
+    let areasHtml = '';
+    dayData.areas.forEach(area => {
+      areasHtml += `<li><strong>${area}</strong></li>`;
+    });
+
+    let tasksHtml = '';
+    dayData.tasks.forEach(task => {
+      tasksHtml += `
+        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 14px; color: var(--text-main);">
+          <input type="checkbox" style="width: 16px; height: 16px; cursor: pointer;"> ${task}
+        </label>
+      `;
+    });
+
+    contentContainer.innerHTML = `
+      <div class="sh-grid-2" style="gap: 20px; margin-bottom: 30px;">
+        <div class="hub-card" style="border-top: 4px solid #3b82f6;">
+          <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px; color: #3b82f6;">
+            <i data-lucide="target" style="width: 22px; height: 22px;"></i>
+            <h3 style="margin: 0; font-size: 16px; color: var(--text-main);">Day ${dayData.day} Focus</h3>
+          </div>
+          <p style="font-size: 17px; font-weight: 600; margin: 0; color: var(--text-main);">${dayData.focus}</p>
+        </div>
+
+        <div class="hub-card" style="border-top: 4px solid #10b981;">
+          <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px; color: #10b981;">
+            <i data-lucide="book" style="width: 22px; height: 22px;"></i>
+            <h3 style="margin: 0; font-size: 16px; color: var(--text-main);">Topic / Chapter</h3>
+          </div>
+          <p style="font-size: 16px; font-weight: 600; margin: 0; color: var(--text-main);">${dayData.topic}</p>
+        </div>
+
+        <div class="hub-card" style="border-top: 4px solid #f59e0b;">
+          <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px; color: #f59e0b;">
+            <i data-lucide="clock" style="width: 22px; height: 22px;"></i>
+            <h3 style="margin: 0; font-size: 16px; color: var(--text-main);">Study Hours</h3>
+          </div>
+          <p style="font-size: 18px; font-weight: bold; margin: 0; color: var(--text-main);">${dayData.hours}</p>
+        </div>
+
+        <div class="hub-card" style="border-top: 4px solid #8b5cf6;">
+          <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px; color: #8b5cf6;">
+            <i data-lucide="check-circle-2" style="width: 22px; height: 22px;"></i>
+            <h3 style="margin: 0; font-size: 16px; color: var(--text-main);">Practice Target</h3>
+          </div>
+          <p style="font-size: 16px; margin: 0; color: var(--text-main);"><strong>${dayData.practice}</strong> <span style="color: var(--text-light); font-size: 14px;">(Numericals: ${dayData.numericals})</span></p>
+        </div>
+
+        <div class="hub-card" style="border-top: 4px solid #ec4899;">
+          <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px; color: #ec4899;">
+            <i data-lucide="star" style="width: 22px; height: 22px;"></i>
+            <h3 style="margin: 0; font-size: 16px; color: var(--text-main);">Key Areas to Focus</h3>
+          </div>
+          <ul style="margin: 0; padding-left: 20px; color: var(--text-main); font-size: 15px; line-height: 1.6;">
+            ${areasHtml}
+          </ul>
+        </div>
+
+        <div class="hub-card" style="border-top: 4px solid #06b6d4;">
+          <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px; color: #06b6d4;">
+            <i data-lucide="file-text" style="width: 22px; height: 22px;"></i>
+            <h3 style="margin: 0; font-size: 16px; color: var(--text-main);">Study Material & Tasks</h3>
+          </div>
+          <p style="font-size: 14px; margin: 0 0 10px 0; color: var(--text-light);">Material: <strong>${dayData.material}</strong></p>
+          <div style="display: flex; flex-direction: column; gap: 8px; border-top: 1px solid var(--border-color); padding-top: 10px;">
+            <strong style="font-size: 13px; color: var(--text-main); text-transform: uppercase;">End of Day Task List:</strong>
+            ${tasksHtml}
+          </div>
+        </div>
+      </div>
+    `;
     if (window.lucide) window.lucide.createIcons();
   };
 
