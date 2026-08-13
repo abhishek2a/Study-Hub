@@ -44,7 +44,7 @@ document.addEventListener('DOMContentLoaded', async () => { try {
   if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1' && window.location.hostname !== '') {
     const appCheck = firebase.appCheck();
     appCheck.activate(
-      new firebase.appCheck.ReCaptchaEnterpriseProvider('6LcRySgtAAAAADDwDo2z-_MKx5FKaapKYAFhdH8O'),
+      new firebase.appCheck.ReCaptchaV3Provider('6LcRySgtAAAAADDwDo2z-_MKx5FKaapKYAFhdH8O'),
       true // isTokenAutoRefreshEnabled
     );
   }
