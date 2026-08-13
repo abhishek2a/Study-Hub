@@ -40,15 +40,14 @@ document.addEventListener('DOMContentLoaded', async () => { try {
     firebase.initializeApp(firebaseConfig);
   }
   
-  // Initialize Firebase App Check with reCAPTCHA Enterprise
-  // NOTE: Disabled for local development to allow login without domain whitelisting
-  /*
-  const appCheck = firebase.appCheck();
-  appCheck.activate(
-    new firebase.appCheck.ReCaptchaEnterpriseProvider('6LcRySgtAAAAADDwDo2z-_MKx5FKaapKYAFhdH8O'),
-    true // isTokenAutoRefreshEnabled
-  );
-  */
+  // Initialize Firebase App Check with reCAPTCHA Enterprise (Only in production)
+  if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1' && window.location.hostname !== '') {
+    const appCheck = firebase.appCheck();
+    appCheck.activate(
+      new firebase.appCheck.ReCaptchaEnterpriseProvider('6LcRySgtAAAAADDwDo2z-_MKx5FKaapKYAFhdH8O'),
+      true // isTokenAutoRefreshEnabled
+    );
+  }
 
   const auth = firebase.auth();
   const db = firebase.firestore();
