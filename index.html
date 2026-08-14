@@ -2,7 +2,9 @@
 <html lang="en">
 <head>
 <script src="plannerData.js?v=2"></script>
-<script src="app.js?v=63"></script>
+<script src="questionsData.js?v=6"></script>
+<script src="practiceLogic.js?v=7"></script>
+<script src="app.js?v=67"></script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
   <title>Study Hub Portal</title>
@@ -284,6 +286,7 @@
       <div class="sh-sidebar">
         <ul class="sh-nav">
           <li id="nav-chapters" class="active" onclick="showStudyChapters()"><i data-lucide="book-open"></i> Chapters</li>
+          <li id="nav-practice" onclick="showPracticeDashboard()"><i data-lucide="edit-3"></i> Practice</li>
           <li id="nav-qb" onclick="showQuestionBanks()"><i data-lucide="database"></i> Question Banks</li>
 
           <li id="nav-examchart" onclick="showExamChart()"><i data-lucide="pie-chart"></i> FR Exam Chart</li>
@@ -374,6 +377,136 @@
         </div>
 
         <!-- Day Planner Tab -->
+
+        <!-- Practice Dashboard Screen -->
+        <div id="practice-dashboard-screen" class="hidden sh-content-wrapper" style="padding: 20px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h1 class="sh-page-title" style="margin: 0;">Dashboard</h1>
+            <button onclick="resetAllPracticeStats()" style="color: var(--acca-red); background: transparent; border: none; cursor: pointer; font-size: 14px;">Reset Question Practice</button>
+          </div>
+
+          <!-- Progress -->
+          <div style="background: #eef2eb; border-radius: 8px; padding: 20px; margin-bottom: 30px;">
+            <h2 style="font-size: 18px; color: #333; margin-top: 0; margin-bottom: 5px;">Progress</h2>
+            <p style="color: #666; font-size: 13px; margin-bottom: 15px;">The progress bar shows the percentage of questions answered across all question categories.</p>
+            <div style="font-size: 12px; margin-bottom: 5px; color: #333;">Completion</div>
+            <div style="background: white; border-radius: 10px; height: 16px; width: 100%; overflow: hidden;">
+              <div id="practice-progress-bar" style="background: #84cc5c; height: 100%; width: 0%; transition: width 0.3s;"></div>
+            </div>
+          </div>
+
+          <!-- Results -->
+          <h2 style="font-size: 18px; color: #333; margin-bottom: 5px;">Results</h2>
+          <p style="color: #666; font-size: 13px; margin-bottom: 20px;">The results show the average statistics of questions answered across all question categories.</p>
+          
+          <div style="display: flex; flex-wrap: wrap; gap: 15px; margin-bottom: 30px;">
+            <div style="border: 1px solid #ddd; border-radius: 6px; padding: 15px; min-width: 120px; text-align: left; background: white;">
+              <div style="font-size: 13px; color: #666; margin-bottom: 5px;">Questions Taken</div>
+              <div id="stat-taken" style="font-size: 18px; color: #333;">0 of 0</div>
+            </div>
+            <div style="border: 1px solid #ddd; border-radius: 6px; padding: 15px; min-width: 120px; text-align: left; background: white;">
+              <div style="font-size: 13px; color: #666; margin-bottom: 5px;">Questions Correct</div>
+              <div id="stat-correct" style="font-size: 18px; color: #333;">0 of 0</div>
+            </div>
+            <div style="border: 1px solid #ddd; border-radius: 6px; padding: 15px; min-width: 80px; text-align: left; background: white;">
+              <div style="font-size: 13px; color: #666; margin-bottom: 5px;">Correct</div>
+              <div id="stat-percent" style="font-size: 18px; color: #333;">0%</div>
+            </div>
+            <div style="border: 1px solid #ddd; border-radius: 6px; padding: 15px; min-width: 120px; text-align: left; background: white;">
+              <div style="font-size: 13px; color: #666; margin-bottom: 5px;">Total Time Taken</div>
+              <div id="stat-total-time" style="font-size: 18px; color: #333;">00:00:00</div>
+            </div>
+            <div style="border: 1px solid #ddd; border-radius: 6px; padding: 15px; min-width: 120px; text-align: left; background: white;">
+              <div style="font-size: 13px; color: #666; margin-bottom: 5px;">Avg. Answer Time</div>
+              <div id="stat-avg-time" style="font-size: 18px; color: #333;">00:00:00</div>
+            </div>
+          </div>
+
+          <!-- Practice Search -->
+          <div style="margin-bottom: 20px;">
+            <div style="position: relative; max-width: 400px;">
+              <i data-lucide="search" style="position: absolute; left: 12px; top: 12px; width: 16px; height: 16px; color: #aaa;"></i>
+              <input type="text" id="practice-search-input" onkeyup="window.filterPracticeCategories(this.value)" placeholder="Search chapters..." style="width: 100%; padding: 10px 10px 10px 36px; border: 1px solid #ddd; border-radius: 6px; outline: none; font-size: 14px; box-sizing: border-box;">
+            </div>
+          </div>
+
+          <!-- Tabs -->
+          <div style="border-bottom: 1px solid #ddd; margin-bottom: 15px; display: flex; gap: 20px;">
+            <div style="padding-bottom: 10px; border-bottom: 2px solid var(--acca-red); color: var(--acca-red); font-weight: bold; cursor: pointer;">Question Categories</div>
+            <div style="padding-bottom: 10px; color: #666; cursor: pointer;">Reset Reports</div>
+          </div>
+
+          <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
+            <thead>
+              <tr style="border-bottom: 1px solid #eee;">
+                <th style="text-align: left; padding: 10px 5px; color: #333;"><i data-lucide="arrow-up-down" style="width: 14px; margin-right: 5px;"></i> Category Name</th>
+                <th style="text-align: right; padding: 10px 5px; color: #333;">Complete</th>
+              </tr>
+            </thead>
+            <tbody id="practice-categories-list">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Exam UI Screen -->
+        <div id="exam-screen" class="hidden" style="position: fixed; inset: 0; z-index: 1000; display: flex; flex-direction: column; background: #f0f2f5;">
+          <!-- Top Bar -->
+          <div style="background: white; border-bottom: 1px solid #e1e4e8; padding: 15px 24px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.02); z-index: 10;">
+            <div style="display: flex; align-items: center; gap: 15px;">
+              <button onclick="showPracticeDashboard()" style="background: #f8f9fa; border: 1px solid #ddd; border-radius: 6px; padding: 6px 10px; cursor: pointer; color: #555; transition: all 0.2s; display: flex; align-items: center;"><i data-lucide="chevron-left" style="width: 18px; height: 18px;"></i></button>
+              <div id="exam-question-counter" style="font-weight: 600; font-size: 16px; color: #2c3e50;">Question 1 of 1</div>
+            </div>
+            <div style="display: flex; gap: 20px; color: #6c757d;">
+              <i data-lucide="calculator" onclick="document.getElementById('calculator-widget').classList.toggle('hidden')" style="cursor: pointer; width: 20px; height: 20px; transition: color 0.2s;" onmouseover="this.style.color='#333'" onmouseout="this.style.color='#6c757d'" title="Calculator"></i>
+              <i data-lucide="edit-2" onclick="document.getElementById('scratchpad-widget').classList.toggle('hidden')" style="cursor: pointer; width: 20px; height: 20px; transition: color 0.2s;" onmouseover="this.style.color='#333'" onmouseout="this.style.color='#6c757d'" title="Scratchpad"></i>
+              <i data-lucide="eraser" onclick="document.getElementById('scratchpad-textarea').value = ''" style="cursor: pointer; width: 20px; height: 20px; transition: color 0.2s;" onmouseover="this.style.color='#333'" onmouseout="this.style.color='#6c757d'" title="Clear Scratchpad"></i>
+              <i id="exam-bookmark-btn" data-lucide="bookmark" onclick="window.togglePracticeFlag()" style="cursor: pointer; width: 20px; height: 20px; transition: color 0.2s;" onmouseover="this.style.color='#333'" onmouseout="this.style.color='#6c757d'" title="Flag Question"></i>
+              <i data-lucide="file-text" onclick="alert('No exhibit provided for this question.')" style="cursor: pointer; width: 20px; height: 20px; transition: color 0.2s;" onmouseover="this.style.color='#333'" onmouseout="this.style.color='#6c757d'" title="Exhibit"></i>
+            </div>
+          </div>
+          
+          <!-- Content Area -->
+          <div style="display: flex; flex: 1; overflow: hidden;">
+            <!-- Main Question Area -->
+            <div style="flex: 1; padding: 40px; overflow-y: auto; display: flex; flex-direction: column;">
+              <div id="exam-chapter-title" style="color: var(--acca-red); font-weight: 600; font-size: 18px; margin-bottom: 24px;">Chapter Title</div>
+              
+              <div style="border: 1px solid #e1e4e8; border-radius: 12px; padding: 32px; background: white; margin-bottom: 24px; box-shadow: 0 4px 12px rgba(0,0,0,0.03);" id="exam-question-box">
+                <div id="exam-question-text" style="font-weight: 500; margin-bottom: 30px; font-size: 16px; line-height: 1.6; color: #1a1a1a;">Question text...</div>
+                <div id="exam-options-container" style="display: flex; flex-direction: column; gap: 12px;">
+                  <!-- Options injected here -->
+                </div>
+              </div>
+
+              <!-- Explanation Area -->
+              <div id="exam-explanation-area" class="hidden" style="background: #f6fbfa; border: 1px solid #a3d4c7; border-radius: 10px; padding: 24px; font-size: 15px; line-height: 1.7; color: #2d3748; box-shadow: 0 2px 8px rgba(132, 204, 92, 0.1);">
+                <!-- Explanation injected here -->
+              </div>
+            </div>
+
+            <!-- Right Sidebar -->
+            <div style="width: 280px; background: white; border-left: 1px solid #e1e4e8; padding: 30px 24px; display: flex; flex-direction: column; box-shadow: -2px 0 8px rgba(0,0,0,0.02); z-index: 5;">
+              <div id="exam-result-badge" class="hidden" style="display: flex; align-items: center; gap: 10px; font-size: 18px; font-weight: 600; margin-bottom: 35px; padding: 12px; border-radius: 8px;">
+                <i id="exam-result-icon" data-lucide="check-circle" style="color: #84cc5c; width: 26px; height: 26px;"></i>
+                <span id="exam-result-text" style="color: #84cc5c;">Correct</span>
+              </div>
+              
+              <div style="background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 8px; padding: 15px; text-align: center; margin-bottom: 30px;">
+                <div style="color: #6c757d; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; margin-bottom: 5px;">Time Spent</div>
+                <div id="exam-timer-display" style="font-size: 20px; font-weight: bold; color: #2c3e50;">0m 0s</div>
+              </div>
+              
+              <div style="display: flex; flex-direction: column; gap: 15px;">
+                 <div style="display: flex; gap: 10px; width: 100%;">
+                    <button id="exam-prev-btn" onclick="window.prevPracticeQuestion()" style="flex: 1; padding: 14px; background: white; color: #6c757d; border: 1px solid #ced4da; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 15px; transition: all 0.2s;" onmouseover="this.style.background='#f8f9fa'; this.style.color='#495057'" onmouseout="this.style.background='white'; this.style.color='#6c757d'">Previous</button>
+                    <button id="exam-skip-btn" onclick="window.nextPracticeQuestion(true)" style="flex: 1; padding: 14px; background: white; color: #6c757d; border: 1px solid #ced4da; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 15px; transition: all 0.2s;" onmouseover="this.style.background='#f8f9fa'; this.style.color='#495057'" onmouseout="this.style.background='white'; this.style.color='#6c757d'">Skip</button>
+                 </div>
+                 <button id="exam-next-btn" class="hidden" onclick="window.nextPracticeQuestion(false)" style="width: 100%; padding: 14px; background: var(--acca-red); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 15px; transition: background 0.2s; box-shadow: 0 4px 6px rgba(227, 24, 55, 0.2);" onmouseover="this.style.background='#c1122a'" onmouseout="this.style.background='var(--acca-red)'">Next Question</button>
+              </div>
+            </div>
+          </div>
+        </div>
 
         <!-- FR Exam Chart & Formula Sheet Tab -->
         <div id="tab-examchart" class="hidden sh-content-wrapper" style="padding: 20px;">
@@ -1083,6 +1216,15 @@
     </div>
   </div>
 
+  <!-- Scratchpad Widget -->
+  <div id="scratchpad-widget" class="hidden" style="position: absolute; top: 100px; right: 350px; z-index: 1000; background: var(--bg-main); border: 1px solid var(--border-color); border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); width: 300px; height: 250px; display: flex; flex-direction: column;">
+    <div class="scratchpad-header" style="background: var(--bg-alt); padding: 10px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; border-radius: 8px 8px 0 0;">
+      <span>Scratchpad</span>
+      <button id="close-scratchpad" onclick="document.getElementById('scratchpad-widget').classList.add('hidden')" style="background: none; border: none; cursor: pointer;"><i data-lucide="x" style="width: 14px;"></i></button>
+    </div>
+    <textarea id="scratchpad-textarea" style="flex: 1; border: none; resize: none; padding: 10px; width: 100%; box-sizing: border-box; background: transparent; color: var(--text-main); font-family: inherit; font-size: 14px;" placeholder="Type your rough notes here..."></textarea>
+  </div>
+
   <!-- Course Details Modal -->
   <div id="course-details-modal" class="hidden" style="position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;z-index:9999;backdrop-filter: blur(4px);">
     <div style="background:var(--panel-bg); border-radius:12px; width:90%; max-width:600px; max-height:85vh; display:flex; flex-direction:column; box-shadow:var(--shadow-card-hover); overflow:hidden;">
@@ -1096,6 +1238,36 @@
       <div style="padding: 20px; border-top: 1px solid var(--border-color); display: flex; justify-content: flex-end; gap: 15px; background: var(--bg-main);">
         <button class="sh-btn" style="background: transparent; color: var(--text-main); border: 1px solid var(--border-color);" onclick="document.getElementById('course-details-modal').classList.add('hidden')">Close</button>
         <button class="sh-btn" id="cd-modal-start-btn" onclick="">Start Study Session</button>
+      </div>
+    </div>
+  </div>
+  <!-- Practice Result Modal -->
+  <div id="practice-result-modal" class="hidden" style="position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;z-index:9999;backdrop-filter: blur(4px);">
+    <div style="background:var(--panel-bg); border-radius:12px; width:90%; max-width:400px; display:flex; flex-direction:column; box-shadow:var(--shadow-card-hover); overflow:hidden; text-align: center;">
+      <div style="padding: 30px 20px 20px 20px;">
+        <i data-lucide="award" style="width: 48px; height: 48px; color: #84cc5c; margin-bottom: 15px;"></i>
+        <h2 style="margin:0 0 10px 0; font-size: 24px; color: var(--text-main);">Practice Complete!</h2>
+        <p style="color: #666; margin: 0 0 20px 0; font-size: 15px;">Here is how you did in this session:</p>
+        
+        <div style="font-size: 42px; font-weight: bold; color: var(--acca-red); margin-bottom: 20px;" id="pr-modal-score">0 / 0</div>
+        
+        <div style="display: flex; justify-content: space-around; background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+          <div>
+            <div style="font-size: 12px; color: #666; text-transform: uppercase;">Correct</div>
+            <div style="font-size: 18px; font-weight: bold; color: #84cc5c;" id="pr-modal-correct">0</div>
+          </div>
+          <div>
+            <div style="font-size: 12px; color: #666; text-transform: uppercase;">Incorrect</div>
+            <div style="font-size: 18px; font-weight: bold; color: var(--acca-red);" id="pr-modal-wrong">0</div>
+          </div>
+          <div>
+            <div style="font-size: 12px; color: #666; text-transform: uppercase;">Skipped</div>
+            <div style="font-size: 18px; font-weight: bold; color: #f59e0b;" id="pr-modal-skipped">0</div>
+          </div>
+        </div>
+      </div>
+      <div style="padding: 20px; border-top: 1px solid var(--border-color); background: var(--bg-main);">
+        <button class="sh-btn" style="width: 100%;" onclick="document.getElementById('practice-result-modal').classList.add('hidden'); window.showPracticeDashboard();">Return to Dashboard</button>
       </div>
     </div>
   </div>

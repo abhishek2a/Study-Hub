@@ -306,12 +306,13 @@ document.addEventListener('DOMContentLoaded', async () => { try {
       }
   };
 
-  function hideAllStudyHubTabs() {
-    ['sh-content-wrapper', 'tab-qb', 'tab-planner', 'tab-examchart', 'tab-tracker', 'tab-profile'].forEach(id => {
+  window.hideAllStudyHubTabs = function() {
+    ['sh-content-wrapper', 'tab-qb', 'tab-planner', 'tab-examchart', 'tab-tracker', 'tab-profile', 'practice-dashboard-screen', 'exam-screen'].forEach(id => {
       const el = document.getElementById(id);
       if (el) { el.classList.add('hidden'); el.style.display = 'none'; }
     });
-  }
+  };
+  const hideAllStudyHubTabs = window.hideAllStudyHubTabs;
 
   window.showStudyChapters = function() {
     document.querySelectorAll('.sh-nav li').forEach(li => li.classList.remove('active'));
@@ -849,6 +850,7 @@ document.addEventListener('DOMContentLoaded', async () => { try {
       "English"
     ]
   };
+  window.courseStructure = courseStructure;
   
   let currentCourse = 'acca';
 
