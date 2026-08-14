@@ -739,8 +739,14 @@ document.addEventListener('DOMContentLoaded', async () => { try {
        const availableContainer = document.getElementById('available-courses-container');
        const inprogressContainer = document.getElementById('ml-inprogress-content').querySelector('div');
        const availableSection = document.getElementById('ml-available-content');
-       
        if (csebCard) {
+         // Patch: Remove CSEB if user is enrolled in both
+         if (isCSEBEnrolled && window.userProfile.enrolledCourses.includes('acca')) {
+            window.userProfile.enrolledCourses = window.userProfile.enrolledCourses.filter(c => c !== 'cseb');
+            db.collection('users').doc(user.uid).update({ enrolledCourses: window.userProfile.enrolledCourses });
+            isCSEBEnrolled = false;
+         }
+
          if (isCSEBEnrolled) {
             inprogressContainer.appendChild(csebCard);
             availableSection.style.display = 'none';
@@ -832,7 +838,7 @@ document.addEventListener('DOMContentLoaded', async () => { try {
       "Chapter 25: Investments in Associates",
       "Chapter 26: Analysis and Interpretation",
       "Chapter 27: IAS 7 Statement of Cash Flows",
-      "Glossary"
+      "Additional Notes"
     ],
     cseb: [
       "Banking",

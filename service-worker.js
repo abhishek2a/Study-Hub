@@ -1,9 +1,9 @@
-const CACHE_NAME = 'study-hub-v26';
+const CACHE_NAME = 'study-hub-v29';
 const urlsToCache = [
   './',
   './index.html',
   './styles.css?v=19',
-  './app.js?v=60',
+  './app.js?v=62',
   './plannerData.js?v=2',
   './icon.jpg'
 ];
