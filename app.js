@@ -734,7 +734,7 @@ document.addEventListener('DOMContentLoaded', async () => { try {
     
     // UI Course Enrollment Check
     if (window.userProfile && window.userProfile.enrolledCourses) {
-       const isCSEBEnrolled = window.userProfile.enrolledCourses.includes('cseb');
+       let isCSEBEnrolled = window.userProfile.enrolledCourses.includes('cseb');
        const csebCard = document.getElementById('cseb-card');
        const availableContainer = document.getElementById('available-courses-container');
        const inprogressContainer = document.getElementById('ml-inprogress-content').querySelector('div');

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <script src="plannerData.js?v=2"></script>
-<script src="app.js?v=62"></script>
+<script src="app.js?v=63"></script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
   <title>Study Hub Portal</title>
@@ -285,7 +285,7 @@
         <ul class="sh-nav">
           <li id="nav-chapters" class="active" onclick="showStudyChapters()"><i data-lucide="book-open"></i> Chapters</li>
           <li id="nav-qb" onclick="showQuestionBanks()"><i data-lucide="database"></i> Question Banks</li>
-          <li id="nav-planner" onclick="showDayPlanner()"><i data-lucide="calendar"></i> Day Planner</li>
+
           <li id="nav-examchart" onclick="showExamChart()"><i data-lucide="pie-chart"></i> FR Exam Chart</li>
           <li id="nav-tracker" onclick="window.toggleTracker()"><i data-lucide="target"></i> Study Tracker</li>
           <li onclick="toggleSearch()"><i data-lucide="search"></i> Search</li>
@@ -374,60 +374,6 @@
         </div>
 
         <!-- Day Planner Tab -->
-        <div id="tab-planner" class="hidden sh-content-wrapper" style="padding: 20px;">
-          <div style="background: var(--acca-red-gradient, linear-gradient(135deg, #E3000F 0%, #9B000A 100%)); padding: 25px; border-radius: 12px; color: white; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.15);">
-            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
-              <div>
-                <span style="background: rgba(255,255,255,0.2); padding: 4px 10px; border-radius: 4px; font-size: 12px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">ACCA 30 Days Completion Strategy</span>
-                <h1 id="planner-header-title" style="margin: 10px 0 0 0; font-size: 28px; color: white; border: none; padding: 0;">Day 1 Plan</h1>
-              </div>
-              <div style="background: rgba(0,0,0,0.2); padding: 8px 15px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.3);">
-                <strong style="font-size: 16px; display: flex; align-items: center; gap: 6px;"><i data-lucide="book-open" style="width: 18px;"></i> FR - Financial Reporting</strong>
-              </div>
-            </div>
-          </div>
-
-          <!-- Day Selection Pills -->
-          <div id="planner-pills-container" style="display: flex; gap: 10px; margin-bottom: 25px; flex-wrap: wrap;">
-            <!-- Dynamically injected pills will go here -->
-          </div>
-
-          <!-- DYNAMIC PLANNER CONTENT -->
-          <div id="planner-content-container">
-            <!-- Dynamically injected day content will go here -->
-          </div>
-
-          <div style="background: var(--panel-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; display: flex; justify-content: space-around; flex-wrap: wrap; gap: 15px; align-items: center; box-shadow: var(--shadow-card);">
-            <div style="display: flex; align-items: center; gap: 10px;">
-              <i data-lucide="clock" style="color: #f59e0b; width: 24px; height: 24px;"></i>
-              <div>
-                <div style="font-size: 12px; color: var(--text-light); text-transform: uppercase; font-weight: bold;">Total Study Time</div>
-                <div style="font-size: 16px; font-weight: bold; color: var(--text-main);">8 - 10 Hours</div>
-              </div>
-            </div>
-            <div style="display: flex; align-items: center; gap: 10px;">
-              <i data-lucide="book-open" style="color: #3b82f6; width: 24px; height: 24px;"></i>
-              <div>
-                <div style="font-size: 12px; color: var(--text-light); text-transform: uppercase; font-weight: bold;">MCQs Target</div>
-                <div style="font-size: 16px; font-weight: bold; color: var(--text-main);">180 MCQs</div>
-              </div>
-            </div>
-            <div style="display: flex; align-items: center; gap: 10px;">
-              <i data-lucide="calculator" style="color: #10b981; width: 24px; height: 24px;"></i>
-              <div>
-                <div style="font-size: 12px; color: var(--text-light); text-transform: uppercase; font-weight: bold;">Numericals Target</div>
-                <div style="font-size: 16px; font-weight: bold; color: var(--text-main);">25 - 30</div>
-              </div>
-            </div>
-            <div style="display: flex; align-items: center; gap: 10px;">
-              <i data-lucide="award" style="color: #e3000f; width: 24px; height: 24px;"></i>
-              <div>
-                <div style="font-size: 12px; color: var(--text-light); text-transform: uppercase; font-weight: bold;">Strategy Focus</div>
-                <div style="font-size: 15px; font-weight: bold; color: var(--text-main);">Consistency • Revision</div>
-              </div>
-            </div>
-          </div>
-        </div>
 
         <!-- FR Exam Chart & Formula Sheet Tab -->
         <div id="tab-examchart" class="hidden sh-content-wrapper" style="padding: 20px;">
