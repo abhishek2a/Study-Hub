@@ -1099,8 +1099,7 @@ document.addEventListener('DOMContentLoaded', async () => { try {
     const btn = document.getElementById('modal-save-btn');
     btn.textContent = "Saving...";
     setSyncStatus("Syncing...");
-    const tinyEditor = tinymce.get('quill-editor');
-    const htmlContent = tinyEditor ? tinyEditor.getContent() : '';
+    const htmlContent = typeof quill !== 'undefined' && quill ? quill.root.innerHTML : '';
     const customTitle = document.getElementById('notes-modal-custom-title').value.trim();
     try {
       await db.collection("course_content").doc(currentModalChapterId).set({
